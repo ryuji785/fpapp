@@ -4,8 +4,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Placeholder for monthly cashflow graph logic using Pinia store
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'MonthlyGraph',
+  setup() {
+    // Placeholder for monthly cashflow graph logic using Pinia store
+    return {};
+  }
+});
 </script>
 
 <style scoped>

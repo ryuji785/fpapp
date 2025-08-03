@@ -10,16 +10,23 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 
-// In real usage, card names and statements would come from Pinia store
-const cardNames = ['Visa', 'Mastercard'];
-const selected = ref(cardNames[0]);
+export default defineComponent({
+  name: 'CardStatement',
+  setup() {
+    // In real usage, card names and statements would come from Pinia store
+    const cardNames = ['Visa', 'Mastercard'];
+    const selected = ref(cardNames[0]);
 
-function filter() {
-  // Placeholder for filter logic
-}
+    function filter() {
+      // Placeholder for filter logic
+    }
+
+    return { cardNames, selected, filter };
+  }
+});
 </script>
 
 <style scoped>

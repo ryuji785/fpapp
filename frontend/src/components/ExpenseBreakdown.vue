@@ -5,8 +5,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Placeholder: would use Pinia store for breakdown data
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'ExpenseBreakdown',
+  setup() {
+    // Placeholder: would use Pinia store for breakdown data
+    return {};
+  }
+});
 </script>
 
 <style scoped>

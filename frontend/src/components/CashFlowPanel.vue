@@ -4,8 +4,16 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Placeholder for cash flow data
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: 'CashFlowPanel',
+  setup() {
+    // Placeholder for cash flow data
+    return {};
+  }
+});
 </script>
 
 <style scoped>

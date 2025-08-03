@@ -2,38 +2,45 @@
   <div ref="layoutEl" class="layout"></div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, createApp } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, onMounted, createApp } from 'vue';
 import { GoldenLayout, type LayoutConfig } from 'golden-layout';
 import CashFlowPanel from './components/CashFlowPanel.vue';
 
-const layoutEl = ref<HTMLDivElement | null>(null);
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const layoutEl = ref<HTMLDivElement | null>(null);
 
-onMounted(() => {
-  if (!layoutEl.value) return;
+    onMounted(() => {
+      if (!layoutEl.value) return;
 
-  const config: LayoutConfig = {
-    root: {
-      type: 'row',
-      content: [
-        {
-          type: 'component',
-          componentType: 'cash-flow',
-          title: 'Cash Flow Table'
+      const config: LayoutConfig = {
+        root: {
+          type: 'row',
+          content: [
+            {
+              type: 'component',
+              componentType: 'cash-flow',
+              title: 'Cash Flow Table'
+            }
+          ]
         }
-      ]
-    }
-  };
+      };
 
-  const layout = new GoldenLayout(config, layoutEl.value);
+      const layout = new GoldenLayout(config, layoutEl.value);
 
-  layout.registerComponentFactoryFunction('cash-flow', container => {
-    const el = document.createElement('div');
-    container.element.appendChild(el);
-    createApp(CashFlowPanel).mount(el);
-  });
+      layout.registerComponentConstructor('cash-flow', container => {
+        const el = document.createElement('div');
+        container.element.append(el);
+        createApp(CashFlowPanel).mount(el);
+      });
 
-  layout.init();
+      layout.init();
+    });
+
+    return { layoutEl };
+  }
 });
 </script>
 
