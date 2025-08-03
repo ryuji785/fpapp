@@ -1,12 +1,6 @@
-<!--
-Install dependencies:
-  npm install
-  npm run dev
-or
-  yarn install
-  yarn dev
--->
+# FPApp
 
-# fpapp
+Monorepo for the Financial Planning Application.
 
-Financial Planning Application frontend scaffold.
+- `backend/`: Spring Boot backend
+- `frontend/`: Vue 3 frontend scaffold
