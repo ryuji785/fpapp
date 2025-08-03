@@ -22,7 +22,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
+
 interface CashFlowRow {
   month: string;
   income: number;
@@ -35,6 +37,13 @@ const mockData: CashFlowRow[] = [
   { month: 'Feb', income: 280000, expenses: 180000, balance: 100000 },
   { month: 'Mar', income: 320000, expenses: 210000, balance: 110000 }
 ];
+
+export default defineComponent({
+  name: 'CashFlowPanel',
+  setup() {
+    return { mockData };
+  }
+});
 </script>
 
 <style scoped>
