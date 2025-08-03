@@ -7,6 +7,14 @@ import { defineComponent, ref, onMounted, createApp } from 'vue';
 import { GoldenLayout, type LayoutConfig } from 'golden-layout';
 import CashFlowPanel from './components/CashFlowPanel.vue';
 
+// minimal container interface expected by Golden Layout when mounting a component
+interface GLContainer {
+  element: HTMLElement;
+}
+
+// custom constructor type to avoid relying on non-exported library types
+type GLComponentConstructor = (container: GLContainer, state?: unknown) => void;
+
 export default defineComponent({
   name: 'App',
   setup() {
@@ -30,11 +38,13 @@ export default defineComponent({
 
       const layout = new GoldenLayout(config, layoutEl.value);
 
-      layout.registerComponentConstructor('cash-flow', container => {
+      const cashFlowCtor: GLComponentConstructor = container => {
         const el = document.createElement('div');
         container.element.append(el);
         createApp(CashFlowPanel).mount(el);
-      });
+      };
+
+      layout.registerComponentConstructor('cash-flow', cashFlowCtor);
 
       layout.init();
     });
