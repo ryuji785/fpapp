@@ -40,4 +40,8 @@ docs/_book
 # TODO: where does this rule come from?
 test/
 
+# Node and Vite
+node_modules/
+dist/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,vue,postgresql
