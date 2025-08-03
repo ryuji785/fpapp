@@ -2,38 +2,55 @@
   <div ref="layoutEl" class="layout"></div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, createApp } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, onMounted, createApp } from 'vue';
 import { GoldenLayout, type LayoutConfig } from 'golden-layout';
 import CashFlowPanel from './components/CashFlowPanel.vue';
 
-const layoutEl = ref<HTMLDivElement | null>(null);
+// minimal container interface expected by Golden Layout when mounting a component
+interface GLContainer {
+  element: HTMLElement;
+}
 
-onMounted(() => {
-  if (!layoutEl.value) return;
+// custom factory type to avoid relying on non-exported library types
+type GLComponentFactory = (container: GLContainer, state?: unknown) => void;
 
-  const config: LayoutConfig = {
-    root: {
-      type: 'row',
-      content: [
-        {
-          type: 'component',
-          componentType: 'cash-flow',
-          title: 'Cash Flow Table'
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const layoutEl = ref<HTMLDivElement | null>(null);
+
+    onMounted(() => {
+      if (!layoutEl.value) return;
+
+      const config: LayoutConfig = {
+        root: {
+          type: 'row',
+          content: [
+            {
+              type: 'component',
+              componentType: 'cash-flow',
+              title: 'Cash Flow Table'
+            }
+          ]
         }
-      ]
-    }
-  };
+      };
 
-  const layout = new GoldenLayout(config, layoutEl.value);
+      const layout = new GoldenLayout(config, layoutEl.value) as any;
 
-  layout.registerComponentFactoryFunction('cash-flow', container => {
-    const el = document.createElement('div');
-    container.element.appendChild(el);
-    createApp(CashFlowPanel).mount(el);
-  });
+      const cashFlowFactory: GLComponentFactory = container => {
+        const el = document.createElement('div');
+        container.element.append(el);
+        createApp(CashFlowPanel).mount(el);
+      };
 
-  layout.init();
+      layout.registerComponentFactoryFunction('cash-flow', cashFlowFactory);
+
+      layout.init();
+    });
+
+    return { layoutEl };
+  }
 });
 </script>
 
