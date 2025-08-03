@@ -1,0 +1,283 @@
+openapi: 3.0.3
+info:
+  title: FPApp API
+  version: 0.1.0
+  description: RESTful API specification for the FPApp financial planning application.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /api/households/{id}:
+    get:
+      summary: Get household
+      description: Retrieve household information by identifier.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Household identifier
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Household detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+              examples:
+                sample:
+                  value:
+                    id: 1
+                    name: Doe Family
+                    members:
+                      - John
+                      - Jane
+  /api/expenses:
+    get:
+      summary: List expenses for a month
+      description: Retrieve expenses belonging to the household for the specified month.
+      parameters:
+        - name: month
+          in: query
+          required: true
+          description: Target month in `YYYY-MM` format.
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: List of expenses for the month
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+              examples:
+                sample:
+                  value:
+                    - id: 1
+                      householdId: 1
+                      date: '2025-08-15'
+                      category: GROCERIES
+                      amount: 5000
+                      description: Supermarket
+    post:
+      summary: Create an expense
+      description: Register a new expense record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreateRequest'
+            examples:
+              sample:
+                value:
+                  householdId: 1
+                  date: '2025-08-20'
+                  category: UTILITIES
+                  amount: 8000
+                  description: Electricity bill
+      responses:
+        '201':
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+              examples:
+                sample:
+                  value:
+                    id: 2
+                    householdId: 1
+                    date: '2025-08-20'
+                    category: UTILITIES
+                    amount: 8000
+                    description: Electricity bill
+  /api/salary/summary:
+    get:
+      summary: Get salary summary
+      description: Returns total salary for the specified month.
+      parameters:
+        - name: month
+          in: query
+          required: true
+          description: Target month in `YYYY-MM` format.
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: Salary summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalarySummary'
+              examples:
+                sample:
+                  value:
+                    month: '2025-08'
+                    total: 500000
+  /api/cards/statement:
+    get:
+      summary: Get credit card statement
+      description: Retrieve credit card statement for the specified billing cycle.
+      parameters:
+        - name: cardId
+          in: query
+          required: true
+          description: Credit card identifier
+          schema:
+            type: integer
+        - name: month
+          in: query
+          required: true
+          description: Billing cycle month in `YYYY-MM` format.
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: Credit card statement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardStatement'
+              examples:
+                sample:
+                  value:
+                    cardId: 1
+                    month: '2025-08'
+                    closingDate: '2025-08-25'
+                    paymentDue: '2025-09-10'
+                    items:
+                      - date: '2025-08-01'
+                        description: Coffee shop
+                        amount: 450
+                        flagged: false
+  /api/fixed-costs:
+    get:
+      summary: List fixed costs
+      description: Retrieve recurring fixed costs for the household.
+      responses:
+        '200':
+          description: List of fixed costs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FixedCost'
+              examples:
+                sample:
+                  value:
+                    - id: 1
+                      householdId: 1
+                      name: Rent
+                      amount: 80000
+                      startDate: '2024-01-01'
+                      endDate: null
+components:
+  schemas:
+    Household:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        date:
+          type: string
+          format: date
+        category:
+          type: string
+          enum: [GROCERIES, UTILITIES, ENTERTAINMENT, OTHER]
+        amount:
+          type: number
+          format: float
+        description:
+          type: string
+    ExpenseCreateRequest:
+      type: object
+      required: [householdId, date, category, amount]
+      properties:
+        householdId:
+          type: integer
+        date:
+          type: string
+          format: date
+        category:
+          type: string
+          enum: [GROCERIES, UTILITIES, ENTERTAINMENT, OTHER]
+        amount:
+          type: number
+          format: float
+        description:
+          type: string
+    SalarySummary:
+      type: object
+      properties:
+        month:
+          type: string
+        total:
+          type: number
+          format: float
+    CardStatement:
+      type: object
+      properties:
+        cardId:
+          type: integer
+        month:
+          type: string
+        closingDate:
+          type: string
+          format: date
+        paymentDue:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              description:
+                type: string
+              amount:
+                type: number
+                format: float
+              flagged:
+                type: boolean
+    FixedCost:
+      type: object
+      properties:
+        id:
+          type: integer
+        householdId:
+          type: integer
+        name:
+          type: string
+        amount:
+          type: number
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+          nullable: true
