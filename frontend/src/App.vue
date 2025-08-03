@@ -44,7 +44,7 @@ export default defineComponent({
         createApp(CashFlowPanel).mount(el);
       };
 
-      layout.registerComponentConstructor('cash-flow', cashFlowCtor);
+      layout.registerComponentFactoryFunction('cash-flow', cashFlowCtor);
 
       layout.init();
     });
