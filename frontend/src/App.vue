@@ -8,6 +8,7 @@ import { GoldenLayout, type LayoutConfig } from 'golden-layout';
 import CashFlowPanel from './components/CashFlowPanel.vue';
 
 const layoutEl = ref<HTMLDivElement | null>(null);
+let layout: GoldenLayout | null = null;
 
 onMounted(() => {
   if (!layoutEl.value) return;
@@ -25,15 +26,17 @@ onMounted(() => {
     }
   };
 
-  const layout = new GoldenLayout(config, layoutEl.value);
+  const gl = new GoldenLayout(config, layoutEl.value);
 
-  layout.registerComponentFactoryFunction('cash-flow', container => {
+  gl.registerComponentConstructor('cash-flow', container => {
     const el = document.createElement('div');
     container.element.appendChild(el);
     createApp(CashFlowPanel).mount(el);
   });
 
-  layout.init();
+  gl.init();
+
+  layout = gl;
 });
 </script>
 
