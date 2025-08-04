@@ -54,7 +54,7 @@ function createConfig(view: 'dashboard' | 'data-entry'): LayoutConfig {
 onMounted(() => {
   if (!layoutEl.value) return;
 
-  layout = new GoldenLayout(createConfig(currentView.value), layoutEl.value) as any;
+  const gl = new GoldenLayout(createConfig(currentView.value), layoutEl.value) as any;
 
   const dashboardCtor: GLComponentConstructor = container => {
     const el = document.createElement('div');
@@ -68,24 +68,32 @@ onMounted(() => {
     createApp(ExpenseInput).mount(el);
   };
 
-  layout.registerComponentConstructor('dashboard', dashboardCtor as any);
-  layout.registerComponentConstructor('data-entry', dataEntryCtor as any);
-  layout.init();
+  gl.registerComponentConstructor('dashboard', dashboardCtor as any);
+  gl.registerComponentConstructor('data-entry', dataEntryCtor as any);
+  gl.init();
+  layout = gl;
+  updateLayoutSize();
 });
+
+function updateLayoutSize() {
+  if (layout && layoutEl.value) {
+    layout.updateSize(layoutEl.value.clientWidth, layoutEl.value.clientHeight);
+  }
+}
 
 function switchView(view: 'dashboard' | 'data-entry') {
   currentView.value = view;
   layout?.loadLayout(createConfig(view));
-  layout?.updateSize();
+  updateLayoutSize();
 }
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value;
-  layout?.updateSize();
+  updateLayoutSize();
 }
 
 watch(sidebarOpen, () => {
-  layout?.updateSize();
+  updateLayoutSize();
 });
 </script>
 
