@@ -9,12 +9,16 @@
   },
   "dependencies": {
     "golden-layout": "^2.6.0",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "quasar": "^2.18.2",
+    "@quasar/extras": "^1.17.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "typescript": "^5.4.2",
     "vite": "^5.1.4",
-    "vue-tsc": "^2.0.6"
+    "vue-tsc": "^2.0.6",
+    "@quasar/vite-plugin": "^1.10.0",
+    "sass": "^1.89.2"
   }
 }

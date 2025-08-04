@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: Expense API
+  version: 1.0.0
+paths:
+  /cashflow/monthly:
+    get:
+      summary: Retrieve monthly cashflow
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: Cashflow totals for month
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  income:
+                    type: number
+                    format: float
+                  expenses:
+                    type: number
+                    format: float
+  /cards/statements:
+    get:
+      summary: List credit card statements
+      parameters:
+        - name: cardName
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of statements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreditCardStatement'
+  /expenses:
+    post:
+      summary: Add an expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+      responses:
+        '201':
+          description: Created expense
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+  /expenses/breakdown:
+    get:
+      summary: Expense breakdown for month
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: Category totals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                    total:
+                      type: number
+                      format: float
+components:
+  schemas:
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        amount:
+          type: number
+          format: float
+        category:
+          type: string
+        description:
+          type: string
+        cardName:
+          type: string
+    CreditCardStatement:
+      type: object
+      properties:
+        id:
+          type: integer
+        cardName:
+          type: string
+        month:
+          type: string
+        closingDate:
+          type: string
+          format: date
+        paymentDue:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              description:
+                type: string
+              amount:
+                type: number
+                format: float
