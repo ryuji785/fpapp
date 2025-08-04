@@ -1,74 +1,28 @@
 <template>
-  <div class="cash-flow-panel">
-    <h2>Monthly Cash Flow</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Income</th>
-          <th>Expenses</th>
-          <th>Balance</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(row, index) in mockData" :key="index">
-          <td>{{ row.month }}</td>
-          <td>{{ row.income }}</td>
-          <td>{{ row.expenses }}</td>
-          <td>{{ row.balance }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="q-pa-md" style="height: 100%; overflow: auto;">
+    <h2 class="q-mb-md">Monthly Cash Flow</h2>
+    <q-table :rows="rows" :columns="columns" row-key="month" flat dense />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-
-interface CashFlowRow {
+<script setup lang="ts">
+interface Row {
   month: string;
   income: number;
   expenses: number;
   balance: number;
 }
 
-const mockData: CashFlowRow[] = [
+const rows: Row[] = [
   { month: 'Jan', income: 300000, expenses: 200000, balance: 100000 },
   { month: 'Feb', income: 280000, expenses: 180000, balance: 100000 },
   { month: 'Mar', income: 320000, expenses: 210000, balance: 110000 }
 ];
 
-export default defineComponent({
-  name: 'CashFlowPanel',
-  setup() {
-    return { mockData };
-  }
-});
+const columns = [
+  { name: 'month', label: 'Month', field: 'month', align: 'left' },
+  { name: 'income', label: 'Income', field: 'income', align: 'right' },
+  { name: 'expenses', label: 'Expenses', field: 'expenses', align: 'right' },
+  { name: 'balance', label: 'Balance', field: 'balance', align: 'right' }
+];
 </script>
-
-<style scoped>
-.cash-flow-panel {
-  padding: 1rem;
-  background-color: #fff;
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-th,
-td {
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  text-align: right;
-}
-
-th {
-  background-color: #f0f0f0;
-}
-</style>
