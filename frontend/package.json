@@ -8,7 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "golden-layout": "^2.6.0",
+    "quasar": "^2.15.2",
+    "@quasar/extras": "^1.16.4",
     "vue": "^3.4.21"
   },
   "devDependencies": {

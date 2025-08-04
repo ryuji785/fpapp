@@ -1,46 +1,55 @@
 <template>
-  <div ref="layoutEl" class="layout"></div>
+  <q-layout view="lHh Lpr lFf">
+    <q-header elevated class="bg-green text-white">
+      <q-toolbar>
+        <q-btn flat dense round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
+        <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
+        <q-btn flat dense round icon="account_circle" />
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+      <q-list>
+        <q-item clickable v-ripple :active="currentPage === 'dashboard'" @click="goTo('dashboard')">
+          <q-item-section>Dashboard</q-item-section>
+        </q-item>
+        <q-item clickable v-ripple :active="currentPage === 'data-entry'" @click="goTo('data-entry')">
+          <q-item-section>Data Entry</q-item-section>
+        </q-item>
+      </q-list>
+    </q-drawer>
+
+    <q-page-container>
+      <transition name="fade" mode="out-in">
+        <component :is="currentComponent" />
+      </transition>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, createApp } from 'vue';
-import { GoldenLayout, type LayoutConfig } from 'golden-layout';
-import CashFlowPanel from './components/CashFlowPanel.vue';
+import { ref, computed } from 'vue';
+import DashboardPage from './pages/DashboardPage.vue';
+import DataEntryPage from './pages/DataEntryPage.vue';
 
-const layoutEl = ref<HTMLDivElement | null>(null);
+const leftDrawerOpen = ref(false);
+const currentPage = ref<'dashboard' | 'data-entry'>('dashboard');
+const components = {
+  dashboard: DashboardPage,
+  'data-entry': DataEntryPage,
+};
+const currentComponent = computed(() => components[currentPage.value]);
 
-onMounted(() => {
-  if (!layoutEl.value) return;
-
-  const config: LayoutConfig = {
-    root: {
-      type: 'row',
-      content: [
-        {
-          type: 'component',
-          componentType: 'cash-flow',
-          title: 'Cash Flow Table'
-        }
-      ]
-    }
-  };
-
-  const layout = new GoldenLayout(config, layoutEl.value);
-
-  layout.registerComponentFactoryFunction('cash-flow', container => {
-    const el = document.createElement('div');
-    container.element.appendChild(el);
-    createApp(CashFlowPanel).mount(el);
-  });
-
-  layout.init();
-});
+function goTo(page: 'dashboard' | 'data-entry') {
+  currentPage.value = page;
+}
 </script>
 
 <style>
-html, body, #app, .layout {
-  height: 100%;
-  width: 100%;
-  margin: 0;
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

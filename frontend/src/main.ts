@@ -3,7 +3,10 @@
 
 import { createApp } from 'vue';
 import App from './App.vue';
-import 'golden-layout/dist/css/goldenlayout-base.css';
-import 'golden-layout/dist/css/themes/goldenlayout-light-theme.css';
+import { Quasar } from 'quasar';
+import 'quasar/dist/quasar.css';
+import '@quasar/extras/material-icons/material-icons.css';
 
-createApp(App).mount('#app');
+const app = createApp(App);
+app.use(Quasar, { plugins: {} });
+app.mount('#app');
