@@ -10,13 +10,20 @@
   </q-page>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts">
+import { ref, defineComponent } from 'vue';
 
-const form = ref({ name: '', amount: null as number | null });
+export default defineComponent({
+  name: 'DataEntry',
+  setup() {
+    const form = ref({ name: '', amount: null as number | null });
 
-function onSubmit() {
-  // mock submit handler
-  console.log('Submitted', form.value);
-}
+    function onSubmit() {
+      // mock submit handler
+      console.log('Submitted', form.value);
+    }
+
+    return { form, onSubmit };
+  }
+});
 </script>
