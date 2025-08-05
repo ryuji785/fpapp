@@ -21,10 +21,10 @@ const rows: Row[] = [
   { month: 'Mar', income: 320000, expenses: 210000, balance: 110000 }
 ];
 
-const columns = [
-  { name: 'month', label: 'Month', field: 'month', align: 'left' },
-  { name: 'income', label: 'Income', field: 'income', align: 'right' },
-  { name: 'expenses', label: 'Expenses', field: 'expenses', align: 'right' },
-  { name: 'balance', label: 'Balance', field: 'balance', align: 'right' }
-] satisfies QTableColumn<Row>[];
+const columns: QTableColumn<Row>[] = [
+  { name: 'month', label: 'Month', field: 'month', align: 'left' as const },
+  { name: 'income', label: 'Income', field: 'income', align: 'right' as const },
+  { name: 'expenses', label: 'Expenses', field: 'expenses', align: 'right' as const },
+  { name: 'balance', label: 'Balance', field: 'balance', align: 'right' as const }
+];
 </script>
