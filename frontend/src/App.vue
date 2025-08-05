@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <AppHeader v-model:drawer="drawer" />
+    <AppHeader v-model:drawer="drawer" :username="userName" />
 
     <q-drawer v-model="drawer" show-if-above bordered overlay>
       <q-list>
@@ -27,6 +27,7 @@ import DataEntry from './components/DataEntry.vue';
 
 const drawer = ref(false);
 const currentView = ref<'dashboard' | 'data-entry'>('dashboard');
+const userName = 'User';
 
 const componentMap = {
   dashboard: Dashboard,

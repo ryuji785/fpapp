@@ -8,13 +8,20 @@
   </q-form>
 </template>
 
-<script setup lang="ts">
-import { reactive } from 'vue';
+<script lang="ts">
+import { defineComponent, reactive } from 'vue';
 
-const form = reactive({ description: '', amount: 0 });
+export default defineComponent({
+  name: 'ExpenseInput',
+  setup() {
+    const form = reactive({ description: '', amount: 0 });
 
-function submit() {
-  form.description = '';
-  form.amount = 0;
-}
+    function submit() {
+      form.description = '';
+      form.amount = 0;
+    }
+
+    return { form, submit };
+  }
+});
 </script>

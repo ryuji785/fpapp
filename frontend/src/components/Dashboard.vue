@@ -22,16 +22,16 @@ interface Row {
 export default defineComponent({
   name: 'Dashboard',
   setup() {
-    const columns = [
-      { name: 'item', label: 'Item', field: 'item', align: 'left' },
+    const columns: QTableColumn<Row>[] = [
+      { name: 'item', label: 'Item', field: 'item', align: 'left' as const },
       {
         name: 'amount',
         label: 'Amount',
         field: 'amount',
-        align: 'right',
+        align: 'right' as const,
         format: (val: number) => `$${val.toFixed(2)}`
       }
-    ] satisfies QTableColumn<Row>[];
+    ];
 
     const rows: Row[] = [
       { id: 1, item: 'Income', amount: 5000 },
