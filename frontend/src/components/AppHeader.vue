@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent, toRef } from 'vue';
 
-export default defineComponent({
+const AppHeader = defineComponent({
   name: 'AppHeader',
   props: {
     drawer: {
@@ -34,6 +34,8 @@ export default defineComponent({
     return { drawer, toggleDrawer };
   }
 });
+
+export default AppHeader;
 </script>
 
 <style scoped>
