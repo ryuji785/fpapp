@@ -1,14 +1,24 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh lpR fFf">
     <q-header elevated class="bg-green-7 text-white">
       <q-toolbar>
-        <q-btn flat dense round icon="menu" @click="drawer = !drawer" />
+        <q-btn flat dense round @click="drawer = !drawer">
+          <transition name="rotate" mode="out-in">
+            <q-icon :key="drawer" :name="drawer ? 'close' : 'menu'" />
+          </transition>
+        </q-btn>
         <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
-        <q-btn flat dense round icon="account_circle" />
+        <div class="row items-center no-wrap q-gutter-sm">
+          <q-icon name="account_circle" />
+          <div class="column items-end">
+            <div>User: ryuji</div>
+            <div>{{ currentTime }}</div>
+          </div>
+        </div>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="drawer" show-if-above bordered>
+    <q-drawer v-model="drawer" show-if-above bordered overlay>
       <q-list>
         <q-item clickable v-ripple active-class="bg-grey-3" :active="currentView === 'dashboard'" @click="switchView('dashboard')">
           <q-item-section>Dashboard</q-item-section>
@@ -20,77 +30,59 @@
     </q-drawer>
 
     <q-page-container>
-      <div ref="layoutEl" class="layout"></div>
+      <component :is="currentComponent" />
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, createApp } from 'vue';
-import { GoldenLayout, type LayoutConfig } from 'golden-layout';
-import CashFlowPanel from './components/CashFlowPanel.vue';
-import ExpenseInput from './components/ExpenseInput.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import DashboardView from './components/DashboardView.vue';
+import DataEntryView from './components/DataEntryView.vue';
 
-interface GLContainer { element: HTMLElement; }
-type GLComponentConstructor = (container: GLContainer, state?: unknown) => void;
-
-const drawer = ref(true);
+const drawer = ref(false);
 const currentView = ref<'dashboard' | 'data-entry'>('dashboard');
-const layoutEl = ref<HTMLDivElement | null>(null);
-let layout: GoldenLayout | null = null;
 
-function createConfig(view: 'dashboard' | 'data-entry'): LayoutConfig {
-  return {
-    root: {
-      type: 'row',
-      content: [
-        { type: 'component', componentType: view, title: view === 'dashboard' ? 'Dashboard' : 'Data Entry' }
-      ]
-    }
-  };
-}
+const componentMap = {
+  dashboard: DashboardView,
+  'data-entry': DataEntryView
+} as const;
 
-onMounted(() => {
-  if (!layoutEl.value) return;
-  const gl = new GoldenLayout(createConfig(currentView.value), layoutEl.value) as any;
-
-  const dashboardCtor: GLComponentConstructor = container => {
-    const el = document.createElement('div');
-    container.element.append(el);
-    createApp(CashFlowPanel).mount(el);
-  };
-
-  const dataEntryCtor: GLComponentConstructor = container => {
-    const el = document.createElement('div');
-    container.element.append(el);
-    createApp(ExpenseInput).mount(el);
-  };
-
-  gl.registerComponentConstructor('dashboard', dashboardCtor as any);
-  gl.registerComponentConstructor('data-entry', dataEntryCtor as any);
-  gl.init();
-  layout = gl;
-  updateLayoutSize();
-});
-
-function updateLayoutSize() {
-  if (layout && layoutEl.value) {
-    layout.updateSize(layoutEl.value.clientWidth, layoutEl.value.clientHeight);
-  }
-}
+const currentComponent = computed(() => componentMap[currentView.value]);
 
 function switchView(view: 'dashboard' | 'data-entry') {
   currentView.value = view;
-  layout?.loadLayout(createConfig(view));
-  updateLayoutSize();
+  drawer.value = false;
 }
 
-watch(drawer, updateLayoutSize);
+const currentTime = ref('');
+let timer: number;
+
+function updateTime() {
+  const now = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const y = now.getUTCFullYear();
+  const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(now.getUTCDate()).padStart(2, '0');
+  const h = String(now.getUTCHours()).padStart(2, '0');
+  const min = String(now.getUTCMinutes()).padStart(2, '0');
+  currentTime.value = `${y}/${m}/${d} ${h}:${min}`;
+}
+
+onMounted(() => {
+  updateTime();
+  timer = window.setInterval(updateTime, 1000);
+});
+
+onBeforeUnmount(() => {
+  clearInterval(timer);
+});
 </script>
 
-<style>
-.layout {
-  width: 100%;
-  height: 100%;
+<style scoped>
+.rotate-enter-active, .rotate-leave-active {
+  transition: transform 0.2s ease;
+}
+.rotate-enter-from, .rotate-leave-to {
+  transform: rotate(180deg);
 }
 </style>
