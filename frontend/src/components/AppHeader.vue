@@ -3,7 +3,7 @@
     <q-toolbar>
       <q-btn flat dense round @click="toggleDrawer">
         <transition name="rotate" mode="out-in">
-          <q-icon :key="drawer" :name="drawer ? 'close' : 'menu'" />
+          <q-icon :key="drawer ? 'close' : 'open'" :name="drawer ? 'close' : 'menu'" />
         </transition>
       </q-btn>
       <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
@@ -12,21 +12,28 @@
   </q-header>
 </template>
 
-<script setup lang="ts">
-import { toRef } from 'vue';
+<script lang="ts">
+import { defineComponent, toRef } from 'vue';
 
-interface Props {
-  drawer: boolean;
-}
+export default defineComponent({
+  name: 'AppHeader',
+  props: {
+    drawer: {
+      type: Boolean,
+      required: true
+    }
+  },
+  emits: ['update:drawer'],
+  setup(props, { emit }) {
+    const drawer = toRef(props, 'drawer');
 
-const props = defineProps<Props>();
-const emit = defineEmits<{ (e: 'update:drawer', value: boolean): void }>();
+    function toggleDrawer() {
+      emit('update:drawer', !drawer.value);
+    }
 
-const drawer = toRef(props, 'drawer');
-
-function toggleDrawer() {
-  emit('update:drawer', !drawer.value);
-}
+    return { drawer, toggleDrawer };
+  }
+});
 </script>
 
 <style scoped>
