@@ -12,13 +12,28 @@
   </q-header>
 </template>
 
-<script setup lang="ts">
-const props = defineProps<{ drawer: boolean }>();
-const emit = defineEmits<{ (e: 'update:drawer', value: boolean): void }>();
+<script lang="ts">
+import { defineComponent, toRef } from 'vue';
 
-function toggleDrawer() {
-  emit('update:drawer', !props.drawer);
-}
+export default defineComponent({
+  name: 'AppHeader',
+  props: {
+    drawer: {
+      type: Boolean,
+      required: true
+    }
+  },
+  emits: ['update:drawer'],
+  setup(props, { emit }) {
+    const drawer = toRef(props, 'drawer');
+
+    function toggleDrawer() {
+      emit('update:drawer', !drawer.value);
+    }
+
+    return { drawer, toggleDrawer };
+  }
+});
 </script>
 
 <style scoped>
