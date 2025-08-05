@@ -17,12 +17,12 @@ export default defineComponent({
   name: 'Dashboard',
   setup() {
     const columns: QTableColumn[] = [
-      { name: 'item', label: 'Item', field: 'item', align: 'left' },
+      { name: 'item', label: 'Item', field: 'item', align: 'left' as const },
       {
         name: 'amount',
         label: 'Amount',
         field: 'amount',
-        align: 'right',
+        align: 'right' as const,
         format: (val: number) => `$${val.toFixed(2)}`
       }
     ];
