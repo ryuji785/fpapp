@@ -13,21 +13,27 @@
 import { defineComponent } from 'vue';
 import type { QTableColumn } from 'quasar';
 
+interface Row {
+  id: number;
+  item: string;
+  amount: number;
+}
+
 export default defineComponent({
   name: 'Dashboard',
   setup() {
-    const columns: QTableColumn[] = [
-      { name: 'item', label: 'Item', field: 'item', align: 'left' as const },
+    const columns = [
+      { name: 'item', label: 'Item', field: 'item', align: 'left' },
       {
         name: 'amount',
         label: 'Amount',
         field: 'amount',
-        align: 'right' as const,
+        align: 'right',
         format: (val: number) => `$${val.toFixed(2)}`
       }
-    ];
+    ] satisfies QTableColumn<Row>[];
 
-    const rows = [
+    const rows: Row[] = [
       { id: 1, item: 'Income', amount: 5000 },
       { id: 2, item: 'Expenses', amount: 3000 }
     ];
