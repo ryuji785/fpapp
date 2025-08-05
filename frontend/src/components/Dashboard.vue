@@ -11,11 +11,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import type { QTableColumn } from 'quasar';
 
 export default defineComponent({
   name: 'Dashboard',
   setup() {
-    const columns = [
+    const columns: QTableColumn[] = [
       { name: 'item', label: 'Item', field: 'item', align: 'left' },
       {
         name: 'amount',

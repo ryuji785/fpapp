@@ -6,6 +6,8 @@
 </template>
 
 <script setup lang="ts">
+import type { QTableColumn } from 'quasar';
+
 interface Row {
   month: string;
   income: number;
@@ -19,7 +21,7 @@ const rows: Row[] = [
   { month: 'Mar', income: 320000, expenses: 210000, balance: 110000 }
 ];
 
-const columns = [
+const columns: QTableColumn<Row>[] = [
   { name: 'month', label: 'Month', field: 'month', align: 'left' },
   { name: 'income', label: 'Income', field: 'income', align: 'right' },
   { name: 'expenses', label: 'Expenses', field: 'expenses', align: 'right' },
