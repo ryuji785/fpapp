@@ -19,8 +19,8 @@
 <script lang="ts">
 import { defineComponent, toRef, ref, onMounted, onUnmounted, computed } from 'vue';
 
-const AppHeader = defineComponent({
-  name: 'AppHeader',
+const TopAppBar = defineComponent({
+  name: 'TopAppBar',
   props: {
     drawer: {
       type: Boolean,
@@ -61,7 +61,7 @@ const AppHeader = defineComponent({
   }
 });
 
-export default AppHeader;
+export default TopAppBar;
 </script>
 
 <style scoped>
