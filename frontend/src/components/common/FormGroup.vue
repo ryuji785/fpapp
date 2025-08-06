@@ -1,9 +1,15 @@
 <template>
-  <q-input :model-value="modelValue" @update:model-value="val => emit('update:modelValue', val)" :label="label" :type="type" />
+  <q-input
+    :model-value="modelValue"
+    @update:model-value="val => $emit('update:modelValue', val)"
+    :label="label"
+    :type="type"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
+import type { QInputProps } from 'quasar';
 
 export default defineComponent({
   name: 'FormGroup',
@@ -17,10 +23,11 @@ export default defineComponent({
       required: true
     },
     type: {
-      type: String,
+      type: String as PropType<QInputProps['type']>,
       default: 'text'
     }
   },
   emits: ['update:modelValue']
 });
 </script>
+
