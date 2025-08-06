@@ -1,11 +1,9 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <q-layout view="lHh Lpr lFf">
     <TopAppBar v-model:drawer="drawer" :username="username" />
     <SideMenu v-model="drawer" />
     <q-page-container>
-      <q-page class="fit">
-        <div ref="glContainer" class="fit"></div>
-      </q-page>
+      <div id="golden-container" ref="glContainer" class="full-width full-height"></div>
     </q-page-container>
   </q-layout>
 </template>
