@@ -21,25 +21,31 @@ export function provideGoldenLayout(initial: string) {
     settings: {
       hasHeaders: true,
       reorderEnabled: true,
+      popoutEnabled: true,
+      closeEnabled: true,
       showPopoutIcon: true,
       showCloseIcon: true
     }
-  };
+  } as unknown as LayoutConfig;
 
   onMounted(() => {
     if (!container.value) return;
     layout = new GoldenLayout(container.value);
+    layout.resizeWithContainerAutomatically = true;
     Object.values(panelRegistry).forEach((def: PanelDefinition) => {
-      layout!.registerComponentFactoryFunction(def.componentName, async (cont: ComponentContainer) => {
-        const el = document.createElement('div');
-        cont.element.appendChild(el);
-        const comp: Component = (await def.loader()).default;
-        const app = createApp(comp);
-        app.mount(el);
-        cont.on('destroy', () => {
-          app.unmount();
-        });
-      });
+      layout!.registerComponentFactoryFunction(
+        def.componentName,
+        async (cont: ComponentContainer) => {
+          const el = document.createElement('div');
+          cont.element.appendChild(el);
+          const comp: Component = (await def.loader()).default;
+          const app = createApp(comp);
+          app.mount(el);
+          cont.on('destroy', () => {
+            app.unmount();
+          });
+        }
+      );
     });
 
     const saved = localStorage.getItem('gl-layout');
@@ -47,7 +53,7 @@ export function provideGoldenLayout(initial: string) {
       layout.loadLayout(JSON.parse(saved) as LayoutConfig);
     } else {
       layout.loadLayout(baseConfig);
-      open(initial);
+      addPanel(initial);
     }
 
     layout.on('stateChanged', () => {
@@ -63,7 +69,7 @@ export function provideGoldenLayout(initial: string) {
     }
   }
 
-  function open(key: string, newInstance = false) {
+  function addPanel(key: string, newInstance = false) {
     if (!layout) return;
     const def = panelRegistry[key];
     if (!def) return;
@@ -81,23 +87,33 @@ export function provideGoldenLayout(initial: string) {
     const title = newInstance
       ? `${def.title} ${(instances[key]?.length ?? 0) + 1}`
       : def.title;
-    const item = layout.newComponent(def.componentName, { id }, title);
-    (instances[key] ||= []).push(item);
-    item.on('destroy', () => {
-      instances[key] = instances[key].filter((i) => i !== item);
-    });
-    item.focus();
+    const config = {
+      type: 'component' as const,
+      componentType: def.componentName,
+      title,
+      componentState: { id }
+    };
+    const root = layout.rootItem;
+    if (root) {
+      const target = root.contentItems[0] || root;
+      const item = (target as any).addChild(config) as ComponentItem;
+      (instances[key] ||= []).push(item);
+      item.container.on('destroy', () => {
+        instances[key] = instances[key].filter((i) => i !== item);
+      });
+      item.focus();
+    }
   }
 
-  provide(GoldenLayoutSymbol, open);
+  provide(GoldenLayoutSymbol, addPanel);
 
-  return { container, open };
+  return { container, addPanel };
 }
 
 export function useGoldenLayout() {
-  const open = inject<(key: string, newInstance?: boolean) => void>(GoldenLayoutSymbol);
-  if (!open) {
+  const addPanel = inject<(key: string, newInstance?: boolean) => void>(GoldenLayoutSymbol);
+  if (!addPanel) {
     throw new Error('GoldenLayout not provided');
   }
-  return open;
+  return addPanel;
 }

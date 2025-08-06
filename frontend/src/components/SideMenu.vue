@@ -31,14 +31,14 @@ export default defineComponent({
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const modelValue = toRef(props, 'modelValue');
-    const open = useGoldenLayout();
+    const addPanel = useGoldenLayout();
     const items = menuItems;
     function update(val: boolean) {
       emit('update:modelValue', val);
     }
     function handle(key: string, e: Event) {
       const me = e as MouseEvent;
-      open(key, me.ctrlKey || me.metaKey);
+      addPanel(key, me.ctrlKey || me.metaKey);
       update(false);
     }
     return { modelValue, items, update, handle };
