@@ -3,7 +3,7 @@
     <TopAppBar v-model:drawer="drawer" :username="username" />
     <SideMenu v-model="drawer" />
     <q-page-container>
-      <router-view />
+      <div ref="glContainer" style="height: 100%"></div>
     </q-page-container>
   </q-layout>
 </template>
@@ -12,6 +12,7 @@
 import { defineComponent, ref } from 'vue';
 import TopAppBar from '../components/TopAppBar.vue';
 import SideMenu from '../components/SideMenu.vue';
+import { provideGoldenLayout } from '../composables/useGoldenLayout';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -19,7 +20,8 @@ export default defineComponent({
   setup() {
     const drawer = ref(false);
     const username = 'User';
-    return { drawer, username };
+    const { container: glContainer } = provideGoldenLayout('dashboard');
+    return { drawer, username, glContainer };
   }
 });
 </script>
