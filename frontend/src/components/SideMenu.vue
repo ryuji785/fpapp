@@ -7,7 +7,7 @@
         clickable
         v-ripple
         active-class="bg-grey-3"
-        @click="handle(item.key)"
+        @click="(e) => handle(item.key, e)"
       >
         <q-item-section>{{ item.label }}</q-item-section>
       </q-item>
@@ -36,8 +36,9 @@ export default defineComponent({
     function update(val: boolean) {
       emit('update:modelValue', val);
     }
-    function handle(key: string) {
-      open(key);
+    function handle(key: string, e: Event) {
+      const me = e as MouseEvent;
+      open(key, me.ctrlKey || me.metaKey);
       update(false);
     }
     return { modelValue, items, update, handle };

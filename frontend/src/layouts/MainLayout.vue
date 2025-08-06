@@ -3,7 +3,9 @@
     <TopAppBar v-model:drawer="drawer" :username="username" />
     <SideMenu v-model="drawer" />
     <q-page-container>
-      <div ref="glContainer" style="height: 100%"></div>
+      <q-page class="fit">
+        <div ref="glContainer" class="fit"></div>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
