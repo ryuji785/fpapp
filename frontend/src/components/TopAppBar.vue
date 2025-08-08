@@ -16,52 +16,35 @@
   </q-header>
 </template>
 
-<script lang="ts">
-import { defineComponent, toRef, ref, onMounted, onUnmounted, computed } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed, toRef } from 'vue';
 
-const TopAppBar = defineComponent({
-  name: 'TopAppBar',
-  props: {
-    drawer: {
-      type: Boolean,
-      required: true
-    },
-    username: {
-      type: String,
-      required: true
-    }
-  },
-  emits: ['update:drawer'],
-  setup(props, { emit }) {
-    const drawer = toRef(props, 'drawer');
-    const username = toRef(props, 'username');
+const props = defineProps<{ drawer: boolean; username: string }>();
+const emit = defineEmits<{ (e: 'update:drawer', value: boolean): void }>();
 
-    const now = ref(new Date());
-    let timer: number;
+const drawer = toRef(props, 'drawer');
+const username = toRef(props, 'username');
 
-    onMounted(() => {
-      timer = window.setInterval(() => {
-        now.value = new Date();
-      }, 1000);
-    });
+const now = ref(new Date());
+let timer: number;
 
-    onUnmounted(() => {
-      clearInterval(timer);
-    });
-
-    const formattedNow = computed(() =>
-      now.value.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
-    );
-
-    function toggleDrawer() {
-      emit('update:drawer', !drawer.value);
-    }
-
-    return { drawer, toggleDrawer, formattedNow, username };
-  }
+onMounted(() => {
+  timer = window.setInterval(() => {
+    now.value = new Date();
+  }, 1000);
 });
 
-export default TopAppBar;
+onUnmounted(() => {
+  clearInterval(timer);
+});
+
+const formattedNow = computed(() =>
+  now.value.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
+);
+
+function toggleDrawer() {
+  emit('update:drawer', !drawer.value);
+}
 </script>
 
 <style scoped>
