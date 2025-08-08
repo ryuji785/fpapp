@@ -66,27 +66,21 @@ export function provideGoldenLayout(initial: string) {
     if (!layout) return;
     if (!layout.rootItem) {
       layout.loadLayout(baseConfig);
+      for (const key in instances) {
+        delete instances[key];
+      }
     }
   }
 
-  function addPanel(key: string, newInstance = false) {
+  function addPanel(key: string) {
     if (!layout) return;
     const def = panelRegistry[key];
     if (!def) return;
 
-    if (!newInstance) {
-      const existing = instances[key]?.[0];
-      if (existing) {
-        existing.focus();
-        return;
-      }
-    }
-
     ensureRoot();
     const id = `${key}-${Date.now()}`;
-    const title = newInstance
-      ? `${def.title} ${(instances[key]?.length ?? 0) + 1}`
-      : def.title;
+    const count = (instances[key]?.length ?? 0) + 1;
+    const title = count > 1 ? `${def.title} ${count}` : def.title;
     const config = {
       type: 'component' as const,
       componentType: def.componentName,
@@ -100,6 +94,9 @@ export function provideGoldenLayout(initial: string) {
       (instances[key] ||= []).push(item);
       item.container.on('destroy', () => {
         instances[key] = instances[key].filter((i) => i !== item);
+        if (instances[key].length === 0) {
+          delete instances[key];
+        }
       });
       item.focus();
     }
@@ -111,7 +108,7 @@ export function provideGoldenLayout(initial: string) {
 }
 
 export function useGoldenLayout() {
-  const addPanel = inject<(key: string, newInstance?: boolean) => void>(GoldenLayoutSymbol);
+  const addPanel = inject<(key: string) => void>(GoldenLayoutSymbol);
   if (!addPanel) {
     throw new Error('GoldenLayout not provided');
   }

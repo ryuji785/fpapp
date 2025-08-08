@@ -19,7 +19,7 @@
   "devDependencies": {
     "@quasar/app-vite": "^2.3.0",
     "@quasar/vite-plugin": "^1.10.0",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^6.0.1",
     "sass": "^1.89.2",
     "typescript": "^5.4.2",
     "vite": "^6.0.0",
