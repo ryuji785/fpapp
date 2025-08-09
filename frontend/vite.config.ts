@@ -4,15 +4,15 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 
 export default defineConfig({
   plugins: [
-    vue({
-      template: { transformAssetUrls },
-    }),
-    quasar(),
+    vue({ template: { transformAssetUrls } }),
+    quasar()
   ],
   resolve: {
     alias: {
-      // force use of Node's built-in crypto
-      crypto: 'node:crypto',
-    },
+      crypto: 'node:crypto'
+    }
   },
+  optimizeDeps: {
+    exclude: ['crypto']
+  }
 });
