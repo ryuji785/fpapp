@@ -7,7 +7,7 @@
         clickable
         v-ripple
         active-class="bg-grey-3"
-        @click="evt => handle(item.key, evt as MouseEvent)"
+        @click="onItemClick(item.key, $event)"
       >
         <q-item-section>{{ item.label }}</q-item-section>
       </q-item>
@@ -34,5 +34,9 @@ function update(val: boolean) {
 function handle(key: string, evt: MouseEvent) {
   emit('open', key, evt.metaKey || evt.ctrlKey);
   update(false);
+}
+
+function onItemClick(key: string, evt: Event) {
+  handle(key, evt as MouseEvent);
 }
 </script>
