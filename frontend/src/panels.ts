@@ -8,7 +8,7 @@ export interface PanelDefinition {
 
 export const panelRegistry: Record<string, PanelDefinition> = {
   dashboard: {
-    title: 'Dashboard',
+    title: 'ダッシュボード',
     componentName: 'DashboardView',
     loader: () => import('./views/DashboardView.vue')
   },
