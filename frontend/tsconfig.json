@@ -1,19 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
     "moduleResolution": "bundler",
+    "module": "ESNext",
+    "target": "ESNext",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "types": ["vite/client", "quasar"],
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",
