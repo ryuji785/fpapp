@@ -7,7 +7,7 @@
 ```bash
 # フロントエンド
 cd frontend
-npm install --legacy-peer-deps
+npm ci
 npm run dev
 
 # ビルド
