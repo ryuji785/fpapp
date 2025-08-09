@@ -2,23 +2,27 @@
   "name": "fpapp-frontend",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "echo \"No tests\" && exit 0"
   },
   "dependencies": {
     "@quasar/extras": "^1.17.0",
     "golden-layout": "^2.6.0",
     "quasar": "^2.18.2",
-    "vue": "^3.4.21"
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
-    "@quasar/vite-plugin": "^1.10.0",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@quasar/vite-plugin": "1.10.0",
+    "@vitejs/plugin-vue": "5.1.4",
+    "@types/node": "^20.11.5",
     "sass": "^1.89.2",
     "typescript": "^5.4.2",
-    "vite": "^7.0.6",
+    "vite": "6.1.0",
     "vue-tsc": "^2.0.6"
   }
 }
