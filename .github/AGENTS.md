@@ -8,6 +8,10 @@ FPApp (Financial Planning Application)
 FPApp is a web-based financial planning application designed to help users visualize future cash flow, manage expenses, simulate financial scenarios, and build assets. It is intended for use by two-person households with complex income/expense structures and multiple credit cards.
 
 ---
+## ✅ Commit Rules
+- Commits may only be pushed after both the frontend (`npm run build`) and backend (`./gradlew build`) builds complete successfully with no warnings or errors. Partial builds or builds with warnings/errors must be fixed before committing.
+
+---
 
 ## 🖥️ Frontend
 - **Framework**: Vue 3
