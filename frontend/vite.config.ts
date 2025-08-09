@@ -9,4 +9,14 @@ export default defineConfig({
     }),
     quasar(),
   ],
+  resolve: {
+    alias: {
+      // force use of Node's built-in crypto
+      crypto: 'node:crypto',
+    },
+  },
+  optimizeDeps: {
+    // avoid pulling in browser crypto polyfills
+    exclude: ['crypto'],
+  },
 });
