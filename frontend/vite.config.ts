@@ -15,8 +15,4 @@ export default defineConfig({
       crypto: 'node:crypto',
     },
   },
-  optimizeDeps: {
-    // avoid pulling in browser crypto polyfills
-    exclude: ['crypto'],
-  },
 });
