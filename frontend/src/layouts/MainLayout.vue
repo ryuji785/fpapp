@@ -1,35 +1,46 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <TopAppBar v-model:drawer="drawer" :username="username" />
-    <SideMenu v-model="drawer" :items="menuItems" @open="openPanel" />
+    <TopAppBar
+      :is-drawer-open="drawerOpen"
+      :username="username"
+      @toggle-drawer="toggleDrawer"
+    />
+
+    <!-- Drawer: overlay under header -->
+    <SideMenu
+      v-model="drawerOpen"
+      :items="menuItems"
+      @open="openPanel"
+    />
+
     <q-page-container>
-      <q-page class="fit">
-        <div id="golden-container" ref="glContainer" class="full-width full-height"></div>
+      <q-page class="q-pa-md">
+        <!-- show current view (your mock dashboard etc.) -->
+        <router-view />
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
-import TopAppBar from '../components/TopAppBar.vue';
-import SideMenu from '../components/SideMenu.vue';
-import { provideGoldenLayout } from '../composables/useGoldenLayout';
-import { menuItems } from '../panels';
+<script setup lang="ts">
+import { ref } from 'vue'
+import TopAppBar from '../components/TopAppBar.vue'
+import SideMenu from '../components/SideMenu.vue'
+import { menuItems } from '../panels'
 
-export default defineComponent({
-  name: 'MainLayout',
-  components: { TopAppBar, SideMenu },
-  setup() {
-    const drawer = ref(false);
-    const username = 'User';
-    const { container: glContainer, addPanel } = provideGoldenLayout('dashboard');
+const username = 'User'
 
-    function openPanel(key: string, _newInstance = false) {
-      addPanel(key);
-    }
+// Drawer closed on initial load
+const drawerOpen = ref(false)
 
-    return { drawer, username, glContainer, menuItems, openPanel };
-  }
-});
+function toggleDrawer() {
+  drawerOpen.value = !drawerOpen.value
+}
+
+// When a menu item is clicked, on mobile we close the drawer.
+// (SideMenu will already emit update on its own; this is just the action hook.)
+function openPanel(key: string, _newInstance = false) {
+  // optional: navigate or open GL panel here
+  // this.$router.push(...) if using routes per menu
+}
 </script>

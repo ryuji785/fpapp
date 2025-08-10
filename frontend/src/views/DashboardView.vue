@@ -1,35 +1,22 @@
 <template>
   <div class="q-pa-md">
-    <PageTitle title="Dashboard" />
-    <div class="row q-col-gutter-md q-mb-md">
-      <div class="col-12 col-sm-4">
-        <SummaryCard title="Income" :value="income" />
+    <h1 class="text-h5 q-mb-md">ダッシュボード</h1>
+    <div class="row q-col-gutter-md">
+      <div class="col-12 col-md-4">
+        <CashFlowPanel />
       </div>
-      <div class="col-12 col-sm-4">
-        <SummaryCard title="Expense" :value="expense" />
+      <div class="col-12 col-md-4">
+        <BudgetProgressPanel />
       </div>
-      <div class="col-12 col-sm-4">
-        <SummaryCard title="Balance" :value="balance" />
+      <div class="col-12 col-md-4">
+        <AccountListPanel />
       </div>
     </div>
-    <ChartPanel title="Income vs Expense" />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import PageTitle from '../components/common/PageTitle.vue';
-import SummaryCard from '../components/common/SummaryCard.vue';
-import ChartPanel from '../components/common/ChartPanel.vue';
-
-export default defineComponent({
-  name: 'DashboardView',
-  components: { PageTitle, SummaryCard, ChartPanel },
-  setup() {
-    const income = 5000;
-    const expense = 3000;
-    const balance = 2000;
-    return { income, expense, balance };
-  }
-});
+<script setup lang="ts">
+import CashFlowPanel from '../components/CashFlowPanel.vue';
+import BudgetProgressPanel from '../components/BudgetProgressPanel.vue';
+import AccountListPanel from '../components/AccountListPanel.vue';
 </script>

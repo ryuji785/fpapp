@@ -1,57 +1,65 @@
 <template>
-  <q-header elevated class="bg-green-7 text-white">
-    <q-toolbar class="relative-position">
-      <q-btn flat dense round @click="toggleDrawer">
+  <q-header elevated class="bg-green-7 text-white z-top">
+    <q-toolbar>
+      <q-btn flat dense round @click="$emit('toggle-drawer')">
         <transition name="rotate" mode="out-in">
-          <q-icon :key="drawer ? 'close' : 'open'" :name="drawer ? 'close' : 'menu'" />
+          <q-icon
+            :key="isDrawerOpen ? 'close' : 'menu'"
+            :name="isDrawerOpen ? 'close' : 'menu'"
+          />
         </transition>
       </q-btn>
-      <q-toolbar-title class="absolute-center">FPApp</q-toolbar-title>
-      <div class="q-ml-auto row items-center q-gutter-sm">
-        <span>{{ formattedNow }}</span>
+
+      <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
+
+      <div class="row items-center no-wrap q-gutter-sm">
         <q-icon name="account_circle" />
-        <span>{{ username }}</span>
+        <div class="column items-end">
+          <div>User: {{ username }}</div>
+          <div>{{ now }}</div>
+        </div>
       </div>
     </q-toolbar>
   </q-header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, toRef } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
-const props = defineProps<{ drawer: boolean; username: string }>();
-const emit = defineEmits<{ (e: 'update:drawer', value: boolean): void }>();
+const props = defineProps<{ isDrawerOpen: boolean; username: string }>();
+defineEmits<{ (e: "toggle-drawer"): void }>();
 
-const drawer = toRef(props, 'drawer');
-const username = toRef(props, 'username');
-
-const now = ref(new Date());
+const now = ref("");
 let timer: number;
 
-onMounted(() => {
-  timer = window.setInterval(() => {
-    now.value = new Date();
-  }, 1000);
-});
-
-onUnmounted(() => {
-  clearInterval(timer);
-});
-
-const formattedNow = computed(() =>
-  now.value.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })
-);
-
-function toggleDrawer() {
-  emit('update:drawer', !drawer.value);
+function tick() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  now.value = `${y}/${m}/${day} ${hh}:${mm}`;
 }
+
+onMounted(() => {
+  tick();
+  timer = window.setInterval(tick, 1000);
+});
+onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <style scoped>
-.rotate-enter-active, .rotate-leave-active {
+.rotate-enter-active,
+.rotate-leave-active {
   transition: transform 0.2s ease;
 }
-.rotate-enter-from, .rotate-leave-to {
+.rotate-enter-from,
+.rotate-leave-to {
   transform: rotate(180deg);
+}
+/* Drawer overlay can reach ~2000–3000; push header above it */
+:deep(.q-header) {
+  z-index: 4000;
 }
 </style>
