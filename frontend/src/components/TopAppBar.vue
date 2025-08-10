@@ -3,7 +3,10 @@
     <q-toolbar>
       <q-btn flat dense round @click="$emit('toggle-drawer')">
         <transition name="rotate" mode="out-in">
-          <q-icon :key="isDrawerOpen ? 'close' : 'menu'" :name="isDrawerOpen ? 'close' : 'menu'" />
+          <q-icon
+            :key="isDrawerOpen ? 'close' : 'menu'"
+            :name="isDrawerOpen ? 'close' : 'menu'"
+          />
         </transition>
       </q-btn>
 
@@ -21,33 +24,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
-const props = defineProps<{ isDrawerOpen: boolean; username: string }>()
-defineEmits<{ (e: 'toggle-drawer'): void }>()
+const props = defineProps<{ isDrawerOpen: boolean; username: string }>();
+defineEmits<{ (e: "toggle-drawer"): void }>();
 
-const now = ref('')
-let timer: number
+const now = ref("");
+let timer: number;
 
 function tick() {
-  const d = new Date()
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  const hh = String(d.getHours()).padStart(2, '0')
-  const mm = String(d.getMinutes()).padStart(2, '0')
-  now.value = `${y}/${m}/${day} ${hh}:${mm}`
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  now.value = `${y}/${m}/${day} ${hh}:${mm}`;
 }
 
 onMounted(() => {
-  tick()
-  timer = window.setInterval(tick, 1000)
-})
-onBeforeUnmount(() => clearInterval(timer))
+  tick();
+  timer = window.setInterval(tick, 1000);
+});
+onBeforeUnmount(() => clearInterval(timer));
 </script>
 
 <style scoped>
-.rotate-enter-active, .rotate-leave-active { transition: transform .2s ease; }
-.rotate-enter-from, .rotate-leave-to { transform: rotate(180deg); }
-:deep(.q-header) { z-index: 4000; }
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: transform 0.2s ease;
+}
+.rotate-enter-from,
+.rotate-leave-to {
+  transform: rotate(180deg);
+}
+/* Drawer overlay can reach ~2000–3000; push header above it */
+:deep(.q-header) {
+  z-index: 4000;
+}
 </style>
