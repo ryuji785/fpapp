@@ -2,12 +2,10 @@
   <q-drawer
     :model-value="modelValue"
     @update:model-value="update"
-    show-if-above
     bordered
-    :overlay="!$q.screen.gt.sm"
-    :mini="!modelValue && $q.screen.gt.sm"
+    behavior="mobile"
+    overlay
     :width="220"
-    :breakpoint="600"
   >
     <q-list>
       <q-item

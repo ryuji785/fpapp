@@ -6,7 +6,7 @@
       @toggle-drawer="toggleDrawer"
     />
 
-    <!-- Drawer: pinned on desktop, overlay on mobile -->
+    <!-- Drawer: overlay under header -->
     <SideMenu
       v-model="drawerOpen"
       :items="menuItems"
@@ -24,16 +24,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuasar } from 'quasar'
 import TopAppBar from '../components/TopAppBar.vue'
 import SideMenu from '../components/SideMenu.vue'
 import { menuItems } from '../panels'
 
-const $q = useQuasar()
 const username = 'User'
 
-// Desktop => open by default, Mobile => closed by default
-const drawerOpen = ref($q.screen.gt.sm)
+// Drawer closed on initial load
+const drawerOpen = ref(false)
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value
