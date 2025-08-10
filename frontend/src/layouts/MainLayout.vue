@@ -10,7 +10,6 @@
     <SideMenu
       v-model="drawerOpen"
       :items="menuItems"
-      @open="openPanel"
     />
 
     <q-page-container>
@@ -24,22 +23,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import TopAppBar from '../components/TopAppBar.vue'
 import SideMenu from '../components/SideMenu.vue'
 import { menuItems } from '../panels'
 
 const username = 'User'
-const router = useRouter()
 
 // Drawer closed on initial load
 const drawerOpen = ref(false)
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value
-}
-
-function openPanel(key: string) {
-  router.push({ name: key })
 }
 </script>

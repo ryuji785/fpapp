@@ -11,10 +11,12 @@
       <q-item
         v-for="item in items"
         :key="item.key"
+        tag="router-link"
+        :to="{ name: item.key }"
         clickable
         v-ripple
         active-class="bg-grey-3"
-        @click="onItemClick(item.key, $event)"
+        @click="onNavigate"
       >
         <q-item-section>{{ item.label }}</q-item-section>
       </q-item>
@@ -30,7 +32,6 @@ type MenuItem = { key: string; label: string }
 const props = defineProps<{ modelValue: boolean; items: MenuItem[] }>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
-  (e: 'open', key: string, newInstance?: boolean): void
 }>()
 
 const { modelValue, items } = toRefs(props)
@@ -40,13 +41,8 @@ function update(val: boolean) {
   emit('update:modelValue', val)
 }
 
-function handle(key: string, evt: MouseEvent) {
-  emit('open', key, evt.metaKey || evt.ctrlKey)
+function onNavigate() {
   // close ONLY on mobile overlay
   if (!$q.screen.gt.sm) update(false)
-}
-
-function onItemClick(key: string, evt: Event) {
-  handle(key, evt as MouseEvent)
 }
 </script>
