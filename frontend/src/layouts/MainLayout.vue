@@ -21,8 +21,9 @@ import SideMenu from '../components/SideMenu.vue';
 import { provideGoldenLayout } from '../composables/useGoldenLayout';
 import { menuItems } from '../panels';
 
-const drawerOpen = ref(true);
+const drawerOpen = ref(true); // desktop: start open
 const username = 'User';
+
 const { container: glContainer, addPanel } = provideGoldenLayout('dashboard');
 
 function openPanel(key: string, _newInstance = false) {

@@ -1,5 +1,12 @@
 <template>
-  <q-drawer :model-value="modelValue" @update:model-value="update" show-if-above bordered overlay>
+  <q-drawer
+    v-model="model"
+    show-if-above
+    behavior="desktop"
+    :breakpoint="1024"
+    bordered
+    :width="260"
+  >
     <q-list>
       <q-item
         v-for="item in items"
@@ -16,9 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue';
+import { toRefs, computed } from 'vue';
+import { useQuasar } from 'quasar';
 
 type MenuItem = { key: string; label: string };
+
 const props = defineProps<{ modelValue: boolean; items: MenuItem[] }>();
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
@@ -26,17 +35,18 @@ const emit = defineEmits<{
 }>();
 
 const { modelValue, items } = toRefs(props);
+const $q = useQuasar();
 
-function update(val: boolean) {
-  emit('update:modelValue', val);
-}
+const model = computed({
+  get: () => modelValue.value,
+  set: (v: boolean) => emit('update:modelValue', v),
+});
 
-function handle(key: string, evt: MouseEvent) {
+function onItemClick(key: string, evt: MouseEvent) {
   emit('open', key, evt.metaKey || evt.ctrlKey);
-  update(false);
-}
-
-function onItemClick(key: string, evt: Event) {
-  handle(key, evt as MouseEvent);
+  // Close only on mobile (overlay mode)
+  if ($q.screen.lt.lg) {
+    model.value = false;
+  }
 }
 </script>
