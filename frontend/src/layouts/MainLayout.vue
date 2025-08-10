@@ -24,11 +24,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import TopAppBar from '../components/TopAppBar.vue'
 import SideMenu from '../components/SideMenu.vue'
 import { menuItems } from '../panels'
 
 const username = 'User'
+const router = useRouter()
 
 // Drawer closed on initial load
 const drawerOpen = ref(false)
@@ -37,10 +39,7 @@ function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value
 }
 
-// When a menu item is clicked, on mobile we close the drawer.
-// (SideMenu will already emit update on its own; this is just the action hook.)
-function openPanel(key: string, _newInstance = false) {
-  // optional: navigate or open GL panel here
-  // this.$router.push(...) if using routes per menu
+function openPanel(key: string) {
+  router.push({ name: key })
 }
 </script>
