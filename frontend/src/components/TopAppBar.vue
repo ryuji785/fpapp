@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated class="bg-green-7 text-white">
+  <q-header elevated class="bg-green-7 text-white z-top">
     <q-toolbar>
       <q-btn flat dense round @click="$emit('toggle-drawer')">
         <transition name="rotate" mode="out-in">
@@ -49,4 +49,5 @@ onBeforeUnmount(() => clearInterval(timer))
 <style scoped>
 .rotate-enter-active, .rotate-leave-active { transition: transform .2s ease; }
 .rotate-enter-from, .rotate-leave-to { transform: rotate(180deg); }
+:deep(.q-header) { z-index: 4000; }
 </style>
