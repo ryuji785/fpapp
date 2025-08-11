@@ -3,8 +3,6 @@ import {
   GoldenLayout,
   type ComponentContainer,
   type LayoutConfig,
-  type ContentItem,
-  type Stack,
   ComponentItem
 } from 'golden-layout';
 import { panelRegistry, type PanelDefinition } from '../panels';
@@ -113,10 +111,17 @@ export function provideGoldenLayout(initialKey?: string) {
     });
   });
 
-  function findFirstStack(): Stack | ContentItem | undefined {
-    if (!layout?.rootItem) return undefined;
-    const stacks = layout.rootItem.getItemsByFilter((it: ContentItem) => (it as any).isStack === true);
-    return (stacks[0] as unknown as Stack) || layout.rootItem;
+  // recursively find the first stack starting from the given item
+  function findFirstStack(item: any): any | null {
+    if (!item) return null;
+    if (item.isStack) return item;
+    const children = item.contentItems as any[] | undefined;
+    if (!children) return null;
+    for (const child of children) {
+      const found = findFirstStack(child);
+      if (found) return found;
+    }
+    return null;
   }
 
   function addPanel(key: string, newInstance = false) {
@@ -132,17 +137,19 @@ export function provideGoldenLayout(initialKey?: string) {
       }
     }
 
-    const target = findFirstStack();
-    if (!target) return;
+    const root = layout!.rootItem;
+    if (!root) return;
+
+    const target = (findFirstStack(root) ?? root) as any;
 
     const itemConfig = {
-      type: 'component' as const,
+      type: 'component',
       componentType: def.componentName,
       title: newInstance ? `${def.title} ${(instances[key]?.length ?? 0) + 1}` : def.title,
       componentState: {}
     };
 
-    const added = (target as any).addChild(itemConfig) as ComponentItem;
+    const added = target.addChild(itemConfig) as ComponentItem;
     (instances[key] ||= []).push(added);
     added.container.on('destroy', () => {
       instances[key] = instances[key].filter(i => i !== added);
