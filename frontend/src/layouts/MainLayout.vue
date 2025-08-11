@@ -1,38 +1,47 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <TopAppBar
-      :is-drawer-open="drawerOpen"
-      :username="username"
-      @toggle-drawer="toggleDrawer"
-    />
+    <!-- Fixed Header -->
+    <TopAppBar :username="username" :showMenuToggle="false" />
 
-    <!-- Drawer: overlay under header -->
+    <!-- Fixed Left Menu (permanently visible, not overlay) -->
     <SideMenu
-      v-model="drawerOpen"
       :items="menuItems"
+      behavior="desktop"
+      :width="240"
+      :overlay="false"
+      :pinned="true"
+      @open="openPanel"
     />
 
+    <!-- Content area driven by GoldenLayout -->
     <q-page-container>
-      <q-page class="q-pa-md">
-        <!-- show current view (your mock dashboard etc.) -->
-        <router-view />
+      <q-page class="fit">
+        <div id="golden-container" ref="glContainer" class="full-width full-height"></div>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import TopAppBar from '../components/TopAppBar.vue'
-import SideMenu from '../components/SideMenu.vue'
-import { menuItems } from '../panels'
+import { provideGoldenLayout } from '../composables/useGoldenLayout';
+import TopAppBar from '../components/TopAppBar.vue';
+import SideMenu from '../components/SideMenu.vue';
+import { menuItems } from '../panels';
 
-const username = 'User'
+const username = 'User';
 
-// Drawer closed on initial load
-const drawerOpen = ref(false)
+// initialize GoldenLayout with default layout
+const { container: glContainer, addPanel } = provideGoldenLayout('dashboard');
 
-function toggleDrawer() {
-  drawerOpen.value = !drawerOpen.value
+function openPanel(key: string, newInstance = false) {
+  addPanel(key, newInstance);
 }
 </script>
+
+<style scoped>
+/* Ensure GL container consumes all available height */
+#golden-container {
+  min-height: 100%;
+}
+</style>
+
