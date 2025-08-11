@@ -4,19 +4,12 @@
     <TopAppBar :username="username" :showMenuToggle="false" />
 
     <!-- Fixed Left Menu (permanently visible, not overlay) -->
-    <SideMenu
-      :items="menuItems"
-      behavior="desktop"
-      :width="240"
-      :overlay="false"
-      :pinned="true"
-      @open="openPanel"
-    />
+      <SideMenu :items="menuItems" @open="openPanel" />
 
     <!-- Content area driven by GoldenLayout -->
     <q-page-container>
-      <q-page class="fit">
-        <div id="golden-container" ref="glContainer" class="full-width full-height"></div>
+      <q-page class="fit no-padding">
+        <div id="golden-container" ref="glContainer" class="gl-host"></div>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -39,9 +32,10 @@ function openPanel(key: string, newInstance = false) {
 </script>
 
 <style scoped>
-/* Ensure GL container consumes all available height */
-#golden-container {
-  min-height: 100%;
+.gl-host {
+  position: absolute;
+  inset: 0;
+  height: 100%;
 }
 </style>
 

@@ -1,9 +1,5 @@
 <template>
-  <div class="q-pa-md">
-    <q-card>
-      <q-card-section>家族情報ビュー</q-card-section>
-    </q-card>
-  </div>
+  <div class="q-pa-md" style="height: 100%">家族情報ビュー</div>
 </template>
 
 <script lang="ts">
