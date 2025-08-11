@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh Lpr lFf">
     <!-- Fixed Header -->
     <TopAppBar :username="username" :showMenuToggle="false" />
 

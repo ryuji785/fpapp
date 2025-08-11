@@ -1,5 +1,5 @@
 <template>
-<q-drawer show-if-above :width="240" bordered :overlay="false">
+<q-drawer show-if-above :width="180" bordered :overlay="false">
   <q-list>
     <q-item v-for="item in items" :key="item.key"
             clickable v-ripple active-class="bg-grey-3"

@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated class="bg-green-7 text-white">
+  <q-header elevated class="bg-green-7 text-white" >
     <q-toolbar>
       <q-btn flat round icon="settings" aria-label="Settings" />
       <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
