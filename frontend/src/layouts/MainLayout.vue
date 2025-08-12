@@ -1,46 +1,41 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <TopAppBar
-      :is-drawer-open="drawerOpen"
-      :username="username"
-      @toggle-drawer="toggleDrawer"
-    />
+  <q-layout view="hHh Lpr lFf">
+    <!-- Fixed Header -->
+    <TopAppBar :username="username" :showMenuToggle="false" />
 
-    <!-- Drawer: overlay under header -->
-    <SideMenu
-      v-model="drawerOpen"
-      :items="menuItems"
-      @open="openPanel"
-    />
+    <!-- Fixed Left Menu (permanently visible, not overlay) -->
+      <SideMenu :items="menuItems" @open="openPanel" />
 
+    <!-- Content area driven by GoldenLayout -->
     <q-page-container>
-      <q-page class="q-pa-md">
-        <!-- show current view (your mock dashboard etc.) -->
-        <router-view />
+      <q-page class="fit no-padding">
+        <div id="golden-container" ref="glContainer" class="gl-host"></div>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import TopAppBar from '../components/TopAppBar.vue'
-import SideMenu from '../components/SideMenu.vue'
-import { menuItems } from '../panels'
+import { provideGoldenLayout } from '../composables/useGoldenLayout';
+import TopAppBar from '../components/TopAppBar.vue';
+import SideMenu from '../components/SideMenu.vue';
+import { menuItems } from '../panels';
 
-const username = 'User'
+const username = 'User';
 
-// Drawer closed on initial load
-const drawerOpen = ref(false)
+// initialize GoldenLayout with default layout
+const { container: glContainer, addPanel } = provideGoldenLayout('dashboard');
 
-function toggleDrawer() {
-  drawerOpen.value = !drawerOpen.value
-}
-
-// When a menu item is clicked, on mobile we close the drawer.
-// (SideMenu will already emit update on its own; this is just the action hook.)
-function openPanel(key: string, _newInstance = false) {
-  // optional: navigate or open GL panel here
-  // this.$router.push(...) if using routes per menu
+function openPanel(key: string, newInstance = false) {
+  addPanel(key, newInstance);
 }
 </script>
+
+<style scoped>
+.gl-host {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+</style>
+

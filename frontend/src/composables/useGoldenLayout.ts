@@ -1,22 +1,60 @@
 import { ref, onMounted, provide, inject, createApp, type Component } from 'vue';
 import {
   GoldenLayout,
-  ComponentItem,
   type ComponentContainer,
-  type LayoutConfig
+  type LayoutConfig,
+  ComponentItem
 } from 'golden-layout';
 import { panelRegistry, type PanelDefinition } from '../panels';
 
 const GoldenLayoutSymbol = Symbol('GoldenLayout');
+const LAYOUT_KEY = 'gl-layout-v3'; // bump version when structure changes
 
-export function provideGoldenLayout(initial: string) {
-  const container = ref<HTMLElement | null>(null);
-  let layout: GoldenLayout | undefined;
-  const instances: Record<string, ComponentItem[]> = {};
-  const baseConfig: LayoutConfig = {
+function defaultLayout(): LayoutConfig {
+  return {
     root: {
-      type: 'row',
-      content: []
+      type: 'column',
+      content: [
+        {
+          type: 'stack',
+          height: 38,
+          content: [
+            {
+              type: 'component',
+              componentType: panelRegistry['cashflow'].componentName,
+              title: panelRegistry['cashflow'].title
+            }
+          ]
+        },
+        {
+          type: 'row',
+          height: 62,
+          content: [
+            {
+              type: 'stack',
+              width: 68,
+              content: [
+                { type: 'component', componentType: panelRegistry['family-info'].componentName,    title: panelRegistry['family-info'].title },
+                { type: 'component', componentType: panelRegistry['asset-management'].componentName, title: panelRegistry['asset-management'].title },
+                { type: 'component', componentType: panelRegistry['life-plan'].componentName,       title: panelRegistry['life-plan'].title },
+                { type: 'component', componentType: panelRegistry['dashboard'].componentName,       title: panelRegistry['dashboard'].title }
+              ]
+            },
+            {
+              type: 'column',
+              width: 32,
+              content: [
+                { type: 'stack', height: 50, content: [
+                  { type: 'component', componentType: panelRegistry['household-manager'].componentName, title: panelRegistry['household-manager'].title }
+                ]},
+                { type: 'stack', height: 50, content: [
+                  { type: 'component', componentType: panelRegistry['data-entry'].componentName, title: panelRegistry['data-entry'].title }
+                ]}
+              ]
+            }
+          ]
+        }
+      ]
     },
     settings: {
       hasHeaders: true,
@@ -27,90 +65,104 @@ export function provideGoldenLayout(initial: string) {
       showCloseIcon: true
     }
   } as unknown as LayoutConfig;
+}
+
+export function provideGoldenLayout(initialKey?: string) {
+  const container = ref<HTMLElement | null>(null);
+  let layout: GoldenLayout | undefined;
+  const instances: Record<string, ComponentItem[]> = {};
 
   onMounted(() => {
     if (!container.value) return;
+
     layout = new GoldenLayout(container.value);
     layout.resizeWithContainerAutomatically = true;
+
+    // Register components
     Object.values(panelRegistry).forEach((def: PanelDefinition) => {
-      layout!.registerComponentFactoryFunction(
-        def.componentName,
-        async (cont: ComponentContainer) => {
-          const el = document.createElement('div');
-          cont.element.appendChild(el);
-          const comp: Component = (await def.loader()).default;
-          const app = createApp(comp);
-          app.mount(el);
-          cont.on('destroy', () => {
-            app.unmount();
-          });
-        }
-      );
+      layout!.registerComponentFactoryFunction(def.componentName, async (cont: ComponentContainer) => {
+        const mount = document.createElement('div');
+        mount.style.height = '100%';
+        cont.element.appendChild(mount);
+        const comp: Component = (await def.loader()).default;
+        const app = createApp(comp);
+        app.mount(mount);
+        cont.on('destroy', () => app.unmount());
+      });
     });
 
-    const saved = localStorage.getItem('gl-layout');
+    // Load layout (cast to LayoutConfig; do not use ResolvedLayoutConfig)
+    const saved = localStorage.getItem(LAYOUT_KEY);
     if (saved) {
-      layout.loadLayout(JSON.parse(saved) as LayoutConfig);
+      try {
+        const cfg = JSON.parse(saved) as unknown as LayoutConfig;
+        layout.loadLayout(cfg);
+      } catch {
+        layout.loadLayout(defaultLayout());
+      }
     } else {
-      layout.loadLayout(baseConfig);
-      addPanel(initial);
+      layout.loadLayout(defaultLayout());
     }
 
+    // Persist
     layout.on('stateChanged', () => {
       const state = layout!.saveLayout();
-      localStorage.setItem('gl-layout', JSON.stringify(state));
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify(state));
     });
   });
 
-  function ensureRoot() {
-    if (!layout) return;
-    if (!layout.rootItem) {
-      layout.loadLayout(baseConfig);
-      for (const key in instances) {
-        delete instances[key];
-      }
+  // recursively find the first stack starting from the given item
+  function findFirstStack(item: any): any | null {
+    if (!item) return null;
+    if (item.isStack) return item;
+    const children = item.contentItems as any[] | undefined;
+    if (!children) return null;
+    for (const child of children) {
+      const found = findFirstStack(child);
+      if (found) return found;
     }
+    return null;
   }
 
-  function addPanel(key: string) {
+  function addPanel(key: string, newInstance = false) {
     if (!layout) return;
     const def = panelRegistry[key];
     if (!def) return;
 
-    ensureRoot();
-    const id = `${key}-${Date.now()}`;
-    const count = (instances[key]?.length ?? 0) + 1;
-    const title = count > 1 ? `${def.title} ${count}` : def.title;
-    const config = {
-      type: 'component' as const,
-      componentType: def.componentName,
-      title,
-      componentState: { id }
-    };
-    const root = layout.rootItem;
-    if (root) {
-      const target = root.contentItems[0] || root;
-      const item = (target as any).addChild(config) as ComponentItem;
-      (instances[key] ||= []).push(item);
-      item.container.on('destroy', () => {
-        instances[key] = instances[key].filter((i) => i !== item);
-        if (instances[key].length === 0) {
-          delete instances[key];
-        }
-      });
-      item.focus();
+    if (!newInstance) {
+      const existing = instances[key]?.[0];
+      if (existing) {
+        existing.focus();
+        return;
+      }
     }
+
+    const root = layout!.rootItem;
+    if (!root) return;
+
+    const target = (findFirstStack(root) ?? root) as any;
+
+    const itemConfig = {
+      type: 'component',
+      componentType: def.componentName,
+      title: newInstance ? `${def.title} ${(instances[key]?.length ?? 0) + 1}` : def.title,
+      componentState: {}
+    };
+
+    const added = target.addChild(itemConfig) as ComponentItem;
+    (instances[key] ||= []).push(added);
+    added.container.on('destroy', () => {
+      instances[key] = instances[key].filter(i => i !== added);
+    });
+    added.focus();
   }
 
   provide(GoldenLayoutSymbol, addPanel);
-
   return { container, addPanel };
 }
 
 export function useGoldenLayout() {
-  const addPanel = inject<(key: string) => void>(GoldenLayoutSymbol);
-  if (!addPanel) {
-    throw new Error('GoldenLayout not provided');
-  }
+  const addPanel = inject<(key: string, newInstance?: boolean) => void>(GoldenLayoutSymbol);
+  if (!addPanel) throw new Error('GoldenLayout not provided');
   return addPanel;
 }
