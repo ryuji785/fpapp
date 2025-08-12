@@ -1,21 +1,18 @@
 <template>
-  <q-header elevated class="bg-green-7 text-white z-top">
+  <q-header elevated class="bg-green-7 text-white">
     <q-toolbar>
-      <q-btn flat dense round @click="$emit('toggle-drawer')">
-        <transition name="rotate" mode="out-in">
-          <q-icon
-            :key="isDrawerOpen ? 'close' : 'menu'"
-            :name="isDrawerOpen ? 'close' : 'menu'"
-          />
-        </transition>
-      </q-btn>
-
+      <q-btn
+        flat
+        dense
+        round
+        :icon="isDrawerOpen ? 'close' : 'menu'"
+        @click="emit('toggle-drawer')"
+      />
       <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
-
       <div class="row items-center no-wrap q-gutter-sm">
         <q-icon name="account_circle" />
         <div class="column items-end">
-          <div>User: {{ username }}</div>
+          <div>ユーザー: {{ username }}</div>
           <div>{{ now }}</div>
         </div>
       </div>
@@ -24,42 +21,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-const props = defineProps<{ isDrawerOpen: boolean; username: string }>();
-defineEmits<{ (e: "toggle-drawer"): void }>();
+const props = defineProps<{ username: string; isDrawerOpen: boolean }>()
+const emit = defineEmits<{ (e: 'toggle-drawer'): void }>()
+const now = ref('')
 
-const now = ref("");
 let timer: number;
-
 function tick() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  now.value = `${y}/${m}/${day} ${hh}:${mm}`;
+  const yy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  now.value = `${yy}/${mm}/${dd} ${h}:${m}:${s}`;
 }
 
 onMounted(() => {
-  tick();
-  timer = window.setInterval(tick, 1000);
-});
-onBeforeUnmount(() => clearInterval(timer));
+  tick()
+  timer = window.setInterval(tick, 1000)
+})
+onBeforeUnmount(() => window.clearInterval(timer))
 </script>
 
-<style scoped>
-.rotate-enter-active,
-.rotate-leave-active {
-  transition: transform 0.2s ease;
-}
-.rotate-enter-from,
-.rotate-leave-to {
-  transform: rotate(180deg);
-}
-/* Drawer overlay can reach ~2000–3000; push header above it */
-:deep(.q-header) {
-  z-index: 4000;
-}
-</style>

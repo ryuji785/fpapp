@@ -7,38 +7,55 @@ export interface PanelDefinition {
 }
 
 export const panelRegistry: Record<string, PanelDefinition> = {
+  // top
+  cashflow: {
+    title: 'キャッシュフロー',
+    componentName: 'CashFlowPanel',
+    loader: () => import('./components/CashFlowPanel.vue')
+  },
+
+  // left tabset
+  'family-info': {
+    title: '家族情報',
+    componentName: 'FamilyInfoView',
+    loader: () => import('./views/FamilyInfoView.vue')
+  },
+  'asset-management': {
+    title: '資産情報',
+    componentName: 'AssetManagementView',
+    loader: () => import('./views/AssetManagementView.vue')
+  },
+  'life-plan': {
+    title: 'ライフイベント',
+    componentName: 'LifePlanSimulationView',
+    loader: () => import('./views/LifePlanSimulationView.vue')
+  },
   dashboard: {
     title: 'ダッシュボード',
     componentName: 'DashboardView',
     loader: () => import('./views/DashboardView.vue')
   },
+
+  // right column
+  'household-manager': {
+    title: '家計管理',
+    componentName: 'HouseholdManagerPanel',
+    loader: () => import('./components/MonthlyGraph.vue')
+  },
   'data-entry': {
-    title: 'Data Entry',
+    title: '家計入力',
     componentName: 'DataEntryView',
     loader: () => import('./views/DataEntryView.vue')
   },
-  'budget-settings': {
-    title: 'Budget Settings',
-    componentName: 'BudgetSettingsView',
-    loader: () => import('./views/BudgetSettingsView.vue')
-  },
-  'asset-management': {
-    title: 'Asset Management',
-    componentName: 'AssetManagementView',
-    loader: () => import('./views/AssetManagementView.vue')
-  },
-  'life-plan': {
-    title: 'Life Plan Simulation',
-    componentName: 'LifePlanSimulationView',
-    loader: () => import('./views/LifePlanSimulationView.vue')
-  },
+
+  // optional extra menu
   reports: {
-    title: 'Reports',
+    title: 'レポート',
     componentName: 'ReportsView',
     loader: () => import('./views/ReportsView.vue')
   },
   settings: {
-    title: 'Settings',
+    title: '設定',
     componentName: 'SettingsView',
     loader: () => import('./views/SettingsView.vue')
   }
@@ -47,4 +64,5 @@ export const panelRegistry: Record<string, PanelDefinition> = {
 export const menuItems = Object.entries(panelRegistry).map(([key, def]) => ({
   key,
   label: def.title
-}));
+}))
+
