@@ -1,18 +1,6 @@
 import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [
-    vue({ template: { transformAssetUrls } }),
-    quasar()
-  ],
-  resolve: {
-    alias: {
-      crypto: 'node:crypto'
-    }
-  },
-  optimizeDeps: {
-    exclude: ['crypto']
-  }
+  plugins: [react()]
 });

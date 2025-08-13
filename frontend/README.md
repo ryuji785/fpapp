@@ -1,12 +1,10 @@
-<!--
-Install dependencies:
-  npm install
-  npm run dev
-or
-  yarn install
-  yarn dev
--->
+# FPApp React Frontend
 
-# fpapp
+## Development
 
-Financial Planning Application frontend scaffold.
+```bash
+npm install
+npm run dev
+```
+
+The app will be available at http://localhost:5173/ by default.
