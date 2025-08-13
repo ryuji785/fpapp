@@ -3,11 +3,11 @@
 Monorepo for the Financial Planning Application.
 
 - `backend/`: Spring Boot backend
-- `frontend/`: React single-page application
+- `frontend/`: Vue 3 single-page application using Quasar and Golden Layout
 
 ## Frontend
 
-The frontend is a Vite-powered React SPA. Development requires **Node.js 20 or later**.
+The frontend is a Vite-powered Vue SPA. Development requires **Node.js 20 or later**.
 
 ```bash
 cd frontend
