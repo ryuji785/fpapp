@@ -1,41 +1,23 @@
 <template>
-  <q-header elevated class="bg-green-7 text-white" >
-    <q-toolbar>
-      <q-btn flat round icon="settings" aria-label="Settings" />
-      <q-toolbar-title class="text-center">FPApp</q-toolbar-title>
-      <div class="row items-center no-wrap q-gutter-sm">
-        <q-icon name="account_circle" />
-        <div class="column items-end">
-          <div>ユーザー: {{ username }}</div>
-          <div>{{ now }}</div>
-        </div>
-      </div>
-    </q-toolbar>
-  </q-header>
+  <q-toolbar>
+    <q-btn flat round dense icon="menu" v-if="!isDrawerOpen" @click="emit('toggle-drawer')" />
+    <q-btn flat round dense icon="close" v-else @click="emit('toggle-drawer')" />
+    <q-toolbar-title>FPApp</q-toolbar-title>
+    <div class="row items-center q-gutter-sm">
+      <q-icon name="account_circle" size="md" />
+      <span>{{ username }}</span>
+      <span>{{ time }}</span>
+    </div>
+  </q-toolbar>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-
-const props = defineProps<{ username: string; showMenuToggle?: boolean }>();
-const now = ref('');
-
-let timer: number;
-function tick() {
-  const d = new Date();
-  const yy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const s = String(d.getSeconds()).padStart(2, '0');
-  now.value = `${yy}/${mm}/${dd} ${h}:${m}:${s}`;
-}
-
-onMounted(() => {
-  tick();
-  timer = window.setInterval(tick, 1000);
-});
-onBeforeUnmount(() => window.clearInterval(timer));
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+const props = defineProps<{ isDrawerOpen: boolean, username: string }>()
+const emit = defineEmits<{ (e:'toggle-drawer'): void }>()
+const time = ref('')
+let timer: number
+function update() { time.value = new Date().toLocaleString() }
+onMounted(() => { update(); timer = window.setInterval(update, 1000) })
+onBeforeUnmount(() => window.clearInterval(timer))
 </script>
-

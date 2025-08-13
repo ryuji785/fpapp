@@ -1,41 +1,58 @@
 <template>
   <q-layout view="hHh Lpr lFf">
-    <!-- Fixed Header -->
-    <TopAppBar :username="username" :showMenuToggle="false" />
+    <q-header elevated class="bg-green-7 text-white">
+      <TopAppBar :is-drawer-open="drawerOpen" :username="username"
+                 @toggle-drawer="toggleDrawer" />
+    </q-header>
 
-    <!-- Fixed Left Menu (permanently visible, not overlay) -->
-      <SideMenu :items="menuItems" @open="openPanel" />
+    <SideMenu v-model="drawerOpen" :items="menuItems" @navigate="handleNavigate" />
 
-    <!-- Content area driven by GoldenLayout -->
     <q-page-container>
-      <q-page class="fit no-padding">
-        <div id="golden-container" ref="glContainer" class="gl-host"></div>
+      <q-page class="fit">
+        <div id="gl-root" ref="glRoot" class="fit" />
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { provideGoldenLayout } from '../composables/useGoldenLayout';
-import TopAppBar from '../components/TopAppBar.vue';
-import SideMenu from '../components/SideMenu.vue';
-import { menuItems } from '../panels';
+import { ref, onMounted, watch } from 'vue'
+import { useQuasar } from 'quasar'
+import { useRouter, useRoute } from 'vue-router'
+import TopAppBar from '@/components/TopAppBar.vue'
+import SideMenu from '@/components/SideMenu.vue'
+import { useGLStore } from '@/stores/useGLStore'
 
-const username = 'User';
+const $q = useQuasar()
+const router = useRouter()
+const route = useRoute()
+const username = 'User'
+const drawerOpen = ref($q.screen.gt.md)
+const glRoot = ref<HTMLDivElement>()
+const menuItems = [
+  { key:'dashboard',    label:'ダッシュボード' },
+  { key:'data-entry',   label:'データ入力' },
+  { key:'list',         label:'一覧' },
+  { key:'future-cf',    label:'将来CF' },
+  { key:'life-events',  label:'ライフイベント' },
+  { key:'settings',     label:'設定' },
+]
 
-// initialize GoldenLayout with default layout
-const { container: glContainer, addPanel } = provideGoldenLayout('dashboard');
+const gl = useGLStore()
 
-function openPanel(key: string, newInstance = false) {
-  addPanel(key, newInstance);
+onMounted(() => {
+  if (glRoot.value) {
+    gl.mount(glRoot.value)
+    if (!gl.restore()) gl.openOrActivatePanel('dashboard')
+  }
+  handleNavigate((route.name as string) || 'dashboard', false)
+  watch(() => route.name, (name) => handleNavigate((name as string) || 'dashboard', false))
+})
+
+function toggleDrawer() { drawerOpen.value = !drawerOpen.value }
+function handleNavigate(name: string, pushRoute = true) {
+  if (pushRoute) router.push({ name })
+  gl.openOrActivatePanel(name)
+  if (!$q.screen.gt.md) drawerOpen.value = false
 }
 </script>
-
-<style scoped>
-.gl-host {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-}
-</style>
-
