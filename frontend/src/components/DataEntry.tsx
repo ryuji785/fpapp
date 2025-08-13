@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from './ui/textarea';
 import { Card } from './ui/card';
 import { formatCurrency, formatDate } from '../utils/currency';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 const categories = [
   '食費', '住居', '水道光熱', '通信', '教育', '医療', '税金', '保険', '投資', 'その他'
