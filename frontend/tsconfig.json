@@ -4,7 +4,7 @@
     "module": "ESNext",
     "target": "ESNext",
     "strict": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
@@ -17,7 +17,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
+    "src/**/*.vue",
     "src/env.d.ts",
     "vite.config.ts"
   ]

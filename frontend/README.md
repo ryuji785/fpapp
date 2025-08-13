@@ -1,6 +1,6 @@
 # FPApp Frontend
 
-React single-page application built with Vite.
+Vue 3 single-page application built with Vite, Quasar, and Golden Layout.
 
 ## Development
 
