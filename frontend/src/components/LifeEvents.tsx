@@ -7,7 +7,7 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { formatCurrency } from '../utils/currency';
 import { Calendar, DollarSign, Plus } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 const sampleEvents = [
   {

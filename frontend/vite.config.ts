@@ -1,23 +1,15 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
-import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
-  plugins: [
-    vue({ template: { transformAssetUrls } }),
-    quasar()
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      crypto: 'node:crypto'
-    }
-  },
-  optimizeDeps: {
-    exclude: ['crypto']
+    },
   },
   build: {
-    chunkSizeWarningLimit: 2000
-  }
-})
+    chunkSizeWarningLimit: 2000,
+  },
+});
