@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { SideDrawer } from './components/SideDrawer';
-import { Dashboard } from './components/Dashboard';
+import MainLayout from './components/MainLayout';
 import { DataEntry } from './components/DataEntry';
 import { List } from './components/List';
 import { FutureCF } from './components/FutureCF';
@@ -49,7 +49,7 @@ export default function App() {
   const renderCurrentView = () => {
     switch (activeRoute) {
       case 'dashboard':
-        return <Dashboard />;
+        return <MainLayout />;
       case 'data-entry':
         return <DataEntry />;
       case 'list':
@@ -60,10 +60,10 @@ export default function App() {
         return <LifeEvents />;
       case 'settings':
         return <Settings />;
-      default:
-        return <Dashboard />;
-    }
-  };
+        default:
+          return <MainLayout />;
+      }
+    };
 
   return (
     <div className="h-screen flex flex-col bg-background">
