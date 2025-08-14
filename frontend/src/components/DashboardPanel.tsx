@@ -18,10 +18,10 @@ export function DashboardPanel({ title, children, onClose, className = '' }: Das
           <h3 className="font-medium text-foreground">{title}</h3>
         </div>
         {onClose && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose} 
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
             className="h-6 w-6 text-muted-foreground hover:text-foreground"
           >
             <X className="h-4 w-4" />
