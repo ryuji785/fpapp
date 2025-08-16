@@ -9,7 +9,7 @@ import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { formatCurrency } from '../utils/currency';
 import { Calendar, Plus, Baby, Home, GraduationCap, Heart, Car, MapPin, Edit, Trash2 } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 // ライフイベントのサンプルデータ
 const lifeEvents = [

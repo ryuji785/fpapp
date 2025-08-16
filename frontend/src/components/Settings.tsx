@@ -24,7 +24,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { formatCurrency } from '../utils/currency';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 // 収入プロファイル型定義
 interface IncomeProfile {

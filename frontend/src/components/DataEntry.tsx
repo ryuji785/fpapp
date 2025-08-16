@@ -26,7 +26,7 @@ import {
 import { cn } from './ui/utils';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 // マスタデータ（後で設定画面で管理）
 const CATEGORIES = {
