@@ -38,7 +38,7 @@ import {
   PlanAssumptions,
   ScenarioSnapshot
 } from '../utils/calculation-engine';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 export function PlanDesign() {
   const [activeTab, setActiveTab] = useState('scenario');

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { formatCurrency } from '../utils/currency';
 import { ChevronLeft, ChevronRight, Edit, Trash2, Filter, Download, Calendar } from 'lucide-react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 // サンプル取引データ
 const transactionData = [
