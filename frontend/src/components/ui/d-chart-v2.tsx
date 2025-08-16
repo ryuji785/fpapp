@@ -8,10 +8,10 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  ReferenceLine
+  ResponsiveContainer
 } from 'recharts';
 import { AXIS } from '../charts/axis-ids';
+import { RefLine } from '../charts/RefLine';
 import { ErrorBoundary } from '../common/ErrorBoundary';
 import { Button } from './button';
 import { Badge } from './badge';
@@ -314,13 +314,14 @@ export function DChartV2({
             
             {/* 今日ライン */}
             {hasRealData && (
-              <ReferenceLine 
-                x={todayLineYear} 
-                stroke={SAFE_COLORS['today-line']} 
+              <RefLine
+                x={todayLineYear}
+                yAxisId={AXIS.ASSETS}
+                stroke={SAFE_COLORS['today-line']}
                 strokeDasharray="2 2"
                 strokeWidth={1}
-                label={{ 
-                  value: "今日", 
+                label={{
+                  value: "今日",
                   position: "insideTopRight",
                   style: { fontSize: 10, fill: SAFE_COLORS['today-line'] }
                 }}
@@ -329,14 +330,15 @@ export function DChartV2({
             
             {/* イベント縦線 */}
             {events.map(event => (
-              <ReferenceLine
+              <RefLine
                 key={`${event.year}-${event.name}`}
                 x={event.year.toString()}
+                yAxisId={AXIS.ASSETS}
                 stroke={SAFE_COLORS['event-line']}
                 strokeDasharray="5 5"
                 strokeWidth={1}
-                label={{ 
-                  value: event.name, 
+                label={{
+                  value: event.name,
                   position: "insideTopRight",
                   style: { fontSize: 10, fill: SAFE_COLORS['event-line'] }
                 }}
@@ -367,7 +369,7 @@ export function DChartV2({
             />
             
             {/* ゼロライン */}
-            <ReferenceLine
+            <RefLine
               y={0}
               yAxisId={AXIS.FLOW}
               stroke="#999"

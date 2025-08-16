@@ -8,8 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  ReferenceLine
+  ResponsiveContainer
 } from 'recharts';
 import { Button } from './button';
 import { Badge } from './badge';
@@ -17,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Users, Calendar } from 'lucide-react';
 import { formatCurrencyAxis, createTooltipFormatter, calculateAgeFromYear } from '../../utils/currency';
 import { AXIS } from '../charts/axis-ids';
+import { RefLine } from '../charts/RefLine';
 import { ErrorBoundary } from '../common/ErrorBoundary';
 
 interface FamilyMember {
@@ -204,9 +204,10 @@ export function DualAxisChart({
             
             {/* 今日ライン（実績データがある場合） */}
             {showRealData && (
-              <ReferenceLine 
-                x={new Date().getFullYear().toString()} 
-                stroke="#666" 
+              <RefLine
+                x={new Date().getFullYear().toString()}
+                yAxisId={AXIS.ASSETS}
+                stroke="#666"
                 strokeDasharray="2 2"
                 label={{ value: "今日", position: "insideTopRight" }}
               />
@@ -214,13 +215,14 @@ export function DualAxisChart({
             
             {/* イベント縦線 */}
             {events.map(event => (
-              <ReferenceLine
+              <RefLine
                 key={`${event.year}-${event.name}`}
                 x={event.year.toString()}
+                yAxisId={AXIS.ASSETS}
                 stroke="#ff6b6b"
                 strokeDasharray="5 5"
-                label={{ 
-                  value: event.name, 
+                label={{
+                  value: event.name,
                   position: "insideTopRight",
                   style: { fontSize: 10 }
                 }}
@@ -252,7 +254,7 @@ export function DualAxisChart({
             />
             
             {/* ゼロライン */}
-            <ReferenceLine y={0} yAxisId={AXIS.FLOW} stroke="#666" strokeDasharray="2 2" />
+            <RefLine y={0} yAxisId={AXIS.FLOW} stroke="#666" strokeDasharray="2 2" />
             </ComposedChart>
           </ResponsiveContainer>
         </ErrorBoundary>
