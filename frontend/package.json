@@ -54,7 +54,8 @@
     "recharts": "^2.15.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "^2.3.0",
-    "vaul": "^1.1.2"
+    "vaul": "^1.1.2",
+    "vite": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
@@ -65,8 +66,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.4.2",
-    "vite": "^7.1.2"
+    "typescript": "^5.4.2"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
