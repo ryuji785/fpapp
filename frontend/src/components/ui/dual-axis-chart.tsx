@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  ComposedChart, 
-  Area, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  ComposedChart,
+  Area,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts';
@@ -16,6 +16,8 @@ import { Badge } from './badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { Users, Calendar } from 'lucide-react';
 import { formatCurrencyAxis, createTooltipFormatter, calculateAgeFromYear } from '../../utils/currency';
+import { AXIS } from '../charts/axis-ids';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 interface FamilyMember {
   id: number;
@@ -143,8 +145,9 @@ export function DualAxisChart({
 
       {/* グラフ */}
       <div className="h-96">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 40, right: 30, left: 20, bottom: 60 }}>
+        <ErrorBoundary>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={data} margin={{ top: 40, right: 30, left: 20, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" />
             
             {/* 下側X軸（西暦） */}
@@ -173,18 +176,20 @@ export function DualAxisChart({
             />
             
             {/* Y軸 */}
-            <YAxis 
-              yAxisId="assets"
+            <YAxis
+              yAxisId={AXIS.ASSETS}
               orientation="left"
               tick={{ fontSize: 12 }}
               tickFormatter={formatCurrencyAxis}
             />
-            <YAxis 
-              yAxisId="flow"
+            <YAxis
+              yAxisId={AXIS.FLOW}
               orientation="right"
               tick={{ fontSize: 12 }}
               tickFormatter={formatCurrencyAxis}
             />
+
+            {import.meta.env.DEV && console.debug('Chart axes ready:', AXIS.ASSETS, AXIS.FLOW)}
             
             <Tooltip 
               content={
@@ -227,7 +232,7 @@ export function DualAxisChart({
             {/* データ系列は親コンポーネントで定義 */}
             {/* 累積資産（エリアチャート） */}
             <Area
-              yAxisId="assets"
+              yAxisId={AXIS.ASSETS}
               type="monotone"
               dataKey="cumulativeAssets"
               fill="#2E7D32"
@@ -239,7 +244,7 @@ export function DualAxisChart({
             
             {/* 年間収支（バーチャート） */}
             <Bar
-              yAxisId="flow"
+              yAxisId={AXIS.FLOW}
               dataKey="annualCashFlow"
               fill="#388E3C"
               name="年間収支"
@@ -247,9 +252,10 @@ export function DualAxisChart({
             />
             
             {/* ゼロライン */}
-            <ReferenceLine y={0} stroke="#666" strokeDasharray="2 2" />
-          </ComposedChart>
-        </ResponsiveContainer>
+            <ReferenceLine y={0} yAxisId={AXIS.FLOW} stroke="#666" strokeDasharray="2 2" />
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ErrorBoundary>
       </div>
 
       {/* 年齢オーバーレイ表示 */}

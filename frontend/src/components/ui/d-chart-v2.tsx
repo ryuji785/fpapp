@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { 
-  ComposedChart, 
-  Area, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  ComposedChart,
+  Area,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts';
+import { AXIS } from '../charts/axis-ids';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 import { Button } from './button';
 import { Badge } from './badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
@@ -244,11 +246,12 @@ export function DChartV2({
 
       {/* D-Chart v2 - 二段チャート */}
       <div style={{ height: `${height}px` }} className="border rounded-lg bg-white p-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart 
-            data={filteredData} 
-            margin={{ top: 60, right: 30, left: 40, bottom: 60 }}
-          >
+        <ErrorBoundary>
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart
+              data={filteredData}
+              margin={{ top: 60, right: 30, left: 40, bottom: 60 }}
+            >
             {/* グリッド */}
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             
@@ -285,21 +288,23 @@ export function DChartV2({
             />
             
             {/* 左側Y軸（累積資産） - 万円固定 */}
-            <YAxis 
-              yAxisId="assets"
+            <YAxis
+              yAxisId={AXIS.ASSETS}
               orientation="left"
               tick={{ fontSize: 12 }}
               tickFormatter={formatCurrencyAxis}
               domain={['dataMin', 'dataMax']}
             />
-            
+
             {/* 右側Y軸（年間収支） - 万円固定 */}
-            <YAxis 
-              yAxisId="flow"
+            <YAxis
+              yAxisId={AXIS.FLOW}
               orientation="right"
               tick={{ fontSize: 12 }}
               tickFormatter={formatCurrencyAxis}
             />
+
+            {import.meta.env.DEV && console.debug('Chart axes ready:', AXIS.ASSETS, AXIS.FLOW)}
             
             {/* ツールチップ */}
             <Tooltip content={<CustomTooltip />} />
@@ -342,7 +347,7 @@ export function DChartV2({
             
             {/* 上段: 累積資産（エリア+線チャート） - 明確な凡例 */}
             <Area
-              yAxisId="assets"
+              yAxisId={AXIS.ASSETS}
               type="monotone"
               dataKey="cumulativeAssets"
               fill={SAFE_COLORS['assets-area']}
@@ -354,7 +359,7 @@ export function DChartV2({
             
             {/* 下段: 年間収支（バーチャート） - 明確な凡例 */}
             <Bar
-              yAxisId="flow"
+              yAxisId={AXIS.FLOW}
               dataKey="annualCashFlow"
               fill={SAFE_COLORS['cashflow-positive']}
               name="年間収支（万円）"
@@ -362,14 +367,16 @@ export function DChartV2({
             />
             
             {/* ゼロライン */}
-            <ReferenceLine 
-              y={0} 
-              stroke="#999" 
-              strokeDasharray="2 2" 
+            <ReferenceLine
+              y={0}
+              yAxisId={AXIS.FLOW}
+              stroke="#999"
+              strokeDasharray="2 2"
               strokeWidth={1}
             />
-          </ComposedChart>
-        </ResponsiveContainer>
+            </ComposedChart>
+          </ResponsiveContainer>
+        </ErrorBoundary>
       </div>
 
       {/* 実績シェード表示（説明） */}
