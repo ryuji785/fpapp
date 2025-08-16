@@ -1,386 +1,308 @@
-import { useState, useMemo } from 'react';
-import { Card } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { formatCurrency } from '../utils/currency';
-
-// 短期（月次）データ - 12ヶ月分
-const shortTermData = [
-  { month: '2025/02', income: 420000, fixedExpense: 280000, variableExpense: 35000, savings: 105000, cumulative: 105000 },
-  { month: '2025/03', income: 428400, fixedExpense: 285600, variableExpense: 35700, savings: 107100, cumulative: 212100 },
-  { month: '2025/04', income: 436968, fixedExpense: 291312, variableExpense: 36414, savings: 109242, cumulative: 321342 },
-  { month: '2025/05', income: 445707, fixedExpense: 297138, variableExpense: 37142, savings: 111427, cumulative: 432769 },
-  { month: '2025/06', income: 454621, fixedExpense: 303081, variableExpense: 37885, savings: 113655, cumulative: 546424 },
-  { month: '2025/07', income: 463714, fixedExpense: 309143, variableExpense: 38643, savings: 115928, cumulative: 662352 },
-  { month: '2025/08', income: 472988, fixedExpense: 315326, variableExpense: 39416, savings: 118246, cumulative: 780598 },
-  { month: '2025/09', income: 482448, fixedExpense: 321632, variableExpense: 40205, savings: 120611, cumulative: 901209 },
-  { month: '2025/10', income: 492097, fixedExpense: 328064, variableExpense: 41009, savings: 123024, cumulative: 1024233 },
-  { month: '2025/11', income: 501939, fixedExpense: 334625, variableExpense: 41829, savings: 125485, cumulative: 1149718 },
-  { month: '2025/12', income: 511978, fixedExpense: 341318, variableExpense: 42665, savings: 127995, cumulative: 1277713 },
-  { month: '2026/01', income: 522218, fixedExpense: 348144, variableExpense: 43518, savings: 130556, cumulative: 1408269 },
-];
-
-// ライフイベントの定義
-const lifeEvents = [
-  { year: 1, name: '結婚', cost: 2500000, color: 'blue' },
-  { year: 3, name: '出産', cost: 500000, color: 'green' },
-  { year: 5, name: '住宅購入', cost: 40000000, color: 'purple' },
-  { year: 18, name: '教育費', cost: 8000000, color: 'orange' },
-];
+import { Switch } from './ui/switch';
+import { Label } from './ui/label';
+import { DChartV2 } from './ui/d-chart-v2';
+import { 
+  TrendingUp, 
+  BarChart3, 
+  Calculator,
+  Calendar,
+  Users,
+  Settings
+} from 'lucide-react';
+import { formatCurrencyShort } from '../utils/currency';
+import { 
+  snapshotManager, 
+  useSnapshot, 
+  getDefaultAssumptions,
+  ScenarioSnapshot
+} from '../utils/calculation-engine';
 
 export function FutureCF() {
-  const [activeTab, setActiveTab] = useState('short-term');
-  const [planYears, setPlanYears] = useState(20); // 可変年数設定
-  const [settings, setSettings] = useState({
-    fixedIncome: '420000',
-    fixedExpense: '280000',
-    variableExpense: '35000',
-    inflationRate: '1.8',
-    incomeGrowthRate: '2.0'
-  });
+  const [currentSnapshotId, setCurrentSnapshotId] = useState<string | null>(null);
+  const [comparisonSnapshotId, setComparisonSnapshotId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'single' | 'comparison'>('single');
+  const [timeHorizon, setTimeHorizon] = useState<'short' | 'medium' | 'long'>('medium');
 
-  // 動的に長期データを生成
-  const longTermData = useMemo(() => {
-    return Array.from({ length: planYears }, (_, i) => {
-      const year = 2025 + i;
-      const baseIncome = 5000000;
-      const baseExpense = 3500000;
-      
-      // ライフイベントコストを計算（設定年数内のイベントのみ）
-      const lifeEventCost = lifeEvents
-        .filter(event => event.year === i + 1 && event.year <= planYears)
-        .reduce((sum, event) => sum + event.cost, 0);
-      
-      const income = Math.round(baseIncome * Math.pow(1.02, i));
-      const expense = Math.round(baseExpense * Math.pow(1.018, i));
-      const savings = income - expense - lifeEventCost;
-      
-      // 累積資産を計算
-      const cumulative = Array.from({ length: i + 1 }, (_, j) => {
-        const yearIncome = baseIncome * Math.pow(1.02, j);
-        const yearExpense = baseExpense * Math.pow(1.018, j);
-        const yearLifeEvent = lifeEvents
-          .filter(event => event.year === j + 1 && event.year <= planYears)
-          .reduce((sum, event) => sum + event.cost, 0);
-        return yearIncome - yearExpense - yearLifeEvent;
-      }).reduce((sum, val) => sum + val, 0);
-      
-      return {
-        year: year.toString(),
-        income,
-        livingExpense: expense,
-        lifeEvent: lifeEventCost,
-        savings,
-        cumulative: Math.round(cumulative)
-      };
-    });
-  }, [planYears]);
+  // スナップショットの取得
+  const primarySnapshot = useSnapshot(currentSnapshotId);
+  const comparisonSnapshot = useSnapshot(comparisonSnapshotId);
 
-  // 累積資産表示用の区切り点を動的に計算
-  const assetMilestones = useMemo(() => {
-    const intervals = [];
-    const quarter = Math.floor(planYears / 4);
+  // 初期データ生成
+  useEffect(() => {
+    const assumptions = getDefaultAssumptions();
+    const snapshot = snapshotManager.createSnapshot(assumptions, 'Base');
+    setCurrentSnapshotId(snapshot.id);
     
-    if (planYears >= 4) {
-      intervals.push({ 
-        label: `${quarter}年後`, 
-        index: quarter - 1, 
-        value: longTermData[quarter - 1]?.cumulative || 0 
-      });
-    }
-    if (planYears >= 8) {
-      intervals.push({ 
-        label: `${quarter * 2}年後`, 
-        index: quarter * 2 - 1, 
-        value: longTermData[quarter * 2 - 1]?.cumulative || 0 
-      });
-    }
-    if (planYears >= 12) {
-      intervals.push({ 
-        label: `${quarter * 3}年後`, 
-        index: quarter * 3 - 1, 
-        value: longTermData[quarter * 3 - 1]?.cumulative || 0 
-      });
-    }
-    intervals.push({ 
-      label: `${planYears}年後`, 
-      index: planYears - 1, 
-      value: longTermData[planYears - 1]?.cumulative || 0 
-    });
-    
-    return intervals;
-  }, [planYears, longTermData]);
+    // 比較用のシナリオも生成（楽観シナリオ）
+    const optimisticAssumptions = {
+      ...assumptions,
+      investmentReturn: assumptions.investmentReturn + 1, // +1%
+      inflationRate: assumptions.inflationRate - 0.5 // -0.5%
+    };
+    const optimisticSnapshot = snapshotManager.createSnapshot(optimisticAssumptions, '楽観シナリオ');
+    setComparisonSnapshotId(optimisticSnapshot.id);
+  }, []);
 
-  const handleSettingChange = (field: string, value: string) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+  // 期間フィルタリング
+  const getFilteredData = (snapshot: ScenarioSnapshot | null) => {
+    if (!snapshot) return [];
+    
+    const totalYears = snapshot.series.length;
+    let endIndex = totalYears;
+    
+    switch (timeHorizon) {
+      case 'short':
+        endIndex = Math.min(10, totalYears); // 10年
+        break;
+      case 'medium':
+        endIndex = Math.min(20, totalYears); // 20年
+        break;
+      case 'long':
+        endIndex = totalYears; // 全期間
+        break;
+    }
+    
+    return snapshot.series.slice(0, endIndex);
   };
 
-  const handleYearsChange = (value: string) => {
-    setPlanYears(parseInt(value));
-  };
+  const filteredPrimaryData = getFilteredData(primarySnapshot);
+  const filteredComparisonData = getFilteredData(comparisonSnapshot);
 
   return (
     <div className="h-full flex flex-col">
       {/* Page Header */}
       <div className="p-4 border-b bg-white">
-        <h1 className="text-xl font-semibold text-foreground">将来キャッシュフロー</h1>
-        <p className="text-sm text-muted-foreground mt-1">短期・長期の資金計画をシミュレーションできます</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">将来予測</h1>
+            <p className="text-sm text-muted-foreground mt-1">長期の資産推移を分析し、シナリオ比較を行えます</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">D-Chart v2</Badge>
+            <Badge variant="outline">分析モード</Badge>
+          </div>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 p-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-2 max-w-md">
-            <TabsTrigger value="short-term">月次CF（1年）</TabsTrigger>
-            <TabsTrigger value="long-term">ライフプラン（{planYears}年）</TabsTrigger>
-          </TabsList>
-
-          {/* 短期キャッシュフロー */}
-          <TabsContent value="short-term" className="flex-1 space-y-4">
-            {/* Settings Panel */}
-            <Card className="p-4">
-              <h3 className="text-lg font-medium mb-4 text-foreground">月次前提条件設定</h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fixedIncome">月収（固定）</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">¥</span>
-                    <Input
-                      id="fixedIncome"
-                      type="number"
-                      className="pl-8"
-                      value={settings.fixedIncome}
-                      onChange={(e) => handleSettingChange('fixedIncome', e.target.value)}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="fixedExpense">固定費</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">¥</span>
-                    <Input
-                      id="fixedExpense"
-                      type="number"
-                      className="pl-8"
-                      value={settings.fixedExpense}
-                      onChange={(e) => handleSettingChange('fixedExpense', e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="variableExpense">変動費</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">¥</span>
-                    <Input
-                      id="variableExpense"
-                      type="number"
-                      className="pl-8"
-                      value={settings.variableExpense}
-                      onChange={(e) => handleSettingChange('variableExpense', e.target.value)}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="inflationRate">インフレ率</Label>
-                  <div className="relative">
-                    <Input
-                      id="inflationRate"
-                      type="number"
-                      step="0.1"
-                      className="pr-8"
-                      value={settings.inflationRate}
-                      onChange={(e) => handleSettingChange('inflationRate', e.target.value)}
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">%</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="incomeGrowthRate">収入上昇率</Label>
-                  <div className="relative">
-                    <Input
-                      id="incomeGrowthRate"
-                      type="number"
-                      step="0.1"
-                      className="pr-8"
-                      value={settings.incomeGrowthRate}
-                      onChange={(e) => handleSettingChange('incomeGrowthRate', e.target.value)}
-                    />
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">%</span>
-                  </div>
-                </div>
-              </div>
+      {/* Content - 上下分割レイアウト */}
+      <div className="flex-1 overflow-auto">
+        {/* 上段: コントロール */}
+        <div className="p-4 border-b bg-gray-50">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            {/* 表示モード */}
+            <Card className="p-3">
+              <Label className="text-sm font-medium mb-2 block">表示モード</Label>
+              <Select value={viewMode} onValueChange={(value: 'single' | 'comparison') => setViewMode(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="single">単一シナリオ</SelectItem>
+                  <SelectItem value="comparison">シナリオ比較</SelectItem>
+                </SelectContent>
+              </Select>
             </Card>
 
-            {/* Chart Panel */}
-            <Card className="flex-1 p-4">
-              <h3 className="text-lg font-medium mb-4 text-foreground">月次キャッシュフロー予測</h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={shortTermData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="month" 
-                      tick={{ fontSize: 12 }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}K`}
-                    />
-                    <Tooltip 
-                      formatter={(value: number, name: string) => [formatCurrency(value), name]}
-                      labelFormatter={(label) => `月: ${label}`}
-                    />
-                    <Legend />
-                    <Bar dataKey="income" stackId="a" fill="#2E7D32" name="収入" />
-                    <Bar dataKey="fixedExpense" stackId="b" fill="#D32F2F" name="固定費" />
-                    <Bar dataKey="variableExpense" stackId="b" fill="#FF9800" name="変動費" />
-                    <Bar dataKey="savings" stackId="c" fill="#1976D2" name="貯蓄" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+            {/* 期間設定 */}
+            <Card className="p-3">
+              <Label className="text-sm font-medium mb-2 block">分析期間</Label>
+              <Select value={timeHorizon} onValueChange={(value: 'short' | 'medium' | 'long') => setTimeHorizon(value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="short">短期（10年）</SelectItem>
+                  <SelectItem value="medium">中期（20年）</SelectItem>
+                  <SelectItem value="long">長期（全期間）</SelectItem>
+                </SelectContent>
+              </Select>
             </Card>
-          </TabsContent>
 
-          {/* 長期ライフプランニング */}
-          <TabsContent value="long-term" className="flex-1 space-y-4">
-            {/* 年数設定とライフイベント設定 */}
-            <Card className="p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-foreground">ライフプランニング設定</h3>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="planYears" className="text-sm">計画年数:</Label>
-                    <Select value={planYears.toString()} onValueChange={handleYearsChange}>
-                      <SelectTrigger className="w-20">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 46 }, (_, i) => i + 5).map(year => (
-                          <SelectItem key={year} value={year.toString()}>
-                            {year}年
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+            {/* シナリオ選択 */}
+            <Card className="p-3">
+              <Label className="text-sm font-medium mb-2 block">
+                {viewMode === 'single' ? 'メインシナリオ' : 'ベースシナリオ'}
+              </Label>
+              <Select value={primarySnapshot?.name || ''} onValueChange={() => {}}>
+                <SelectTrigger>
+                  <SelectValue placeholder="シナリオを選択" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Base">Base</SelectItem>
+                  <SelectItem value="楽観シナリオ">楽観シナリオ</SelectItem>
+                  <SelectItem value="悲観シナリオ">悲観シナリオ</SelectItem>
+                </SelectContent>
+              </Select>
+            </Card>
+
+            {/* 比較シナリオ選択 */}
+            {viewMode === 'comparison' && (
+              <Card className="p-3">
+                <Label className="text-sm font-medium mb-2 block">比較シナリオ</Label>
+                <Select value={comparisonSnapshot?.name || ''} onValueChange={() => {}}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="比較対象を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="楽観シナリオ">楽観シナリオ</SelectItem>
+                    <SelectItem value="悲観シナリオ">悲観シナリオ</SelectItem>
+                    <SelectItem value="カスタム">カスタム</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* 中段: 分析サマリー */}
+        <div className="p-4 bg-white">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            {primarySnapshot && (
+              <>
+                <Card className="p-4 text-center">
+                  <div className="text-2xl font-bold text-primary mb-1">
+                    {formatCurrencyShort(primarySnapshot.finalAssets)}
                   </div>
-                  <Button variant="outline" size="sm">
-                    イベント追加
-                  </Button>
-                </div>
-              </div>
-              
-              {/* ライフイベント表示（設定年数以内のもののみ） */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {lifeEvents
-                  .filter(event => event.year <= planYears)
-                  .map(event => (
-                    <div key={event.year} className={`p-3 rounded-lg border ${
-                      event.color === 'blue' ? 'bg-blue-50 border-blue-200' :
-                      event.color === 'green' ? 'bg-green-50 border-green-200' :
-                      event.color === 'purple' ? 'bg-purple-50 border-purple-200' :
-                      'bg-orange-50 border-orange-200'
-                    }`}>
-                      <div className={`text-sm mb-1 ${
-                        event.color === 'blue' ? 'text-blue-600' :
-                        event.color === 'green' ? 'text-green-600' :
-                        event.color === 'purple' ? 'text-purple-600' :
-                        'text-orange-600'
-                      }`}>
-                        {2025 + event.year - 1}年 {event.name}
-                      </div>
-                      <div className={`font-medium ${
-                        event.color === 'blue' ? 'text-blue-700' :
-                        event.color === 'green' ? 'text-green-700' :
-                        event.color === 'purple' ? 'text-purple-700' :
-                        'text-orange-700'
-                      }`}>
-                        {formatCurrency(event.cost)}
-                      </div>
+                  <div className="text-sm text-muted-foreground">最終資産</div>
+                  {viewMode === 'comparison' && comparisonSnapshot && (
+                    <div className="text-xs mt-1">
+                      差分: {formatCurrencyShort(primarySnapshot.finalAssets - comparisonSnapshot.finalAssets)}
                     </div>
-                  ))}
-              </div>
-            </Card>
+                  )}
+                </Card>
 
-            {/* 長期Chart Panel */}
-            <Card className="flex-1 p-4">
-              <h3 className="text-lg font-medium mb-4 text-foreground">{planYears}年間キャッシュフロー予測</h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={longTermData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="year" 
-                      tick={{ fontSize: 12 }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis 
-                      tick={{ fontSize: 12 }}
-                      tickFormatter={(value) => `¥${(value / 1000000).toFixed(1)}M`}
-                    />
-                    <Tooltip 
-                      formatter={(value: number, name: string) => [formatCurrency(value), name]}
-                      labelFormatter={(label) => `年: ${label}`}
-                    />
-                    <Legend />
-                    <Bar dataKey="income" stackId="a" fill="#2E7D32" name="年収" />
-                    <Bar dataKey="livingExpense" stackId="b" fill="#D32F2F" name="生活費" />
-                    <Bar dataKey="lifeEvent" stackId="b" fill="#FF9800" name="ライフイベント" />
-                    <Bar dataKey="savings" stackId="c" fill="#1976D2" name="年間貯蓄" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
-
-            {/* 累積資産推移 */}
-            <Card className="p-4">
-              <h3 className="text-lg font-medium mb-4 text-foreground">累積資産推移</h3>
-              <div className={`grid gap-4 ${
-                assetMilestones.length === 2 ? 'grid-cols-2' :
-                assetMilestones.length === 3 ? 'grid-cols-3' :
-                'grid-cols-2 md:grid-cols-4'
-              }`}>
-                {assetMilestones.map((milestone, index) => (
-                  <div key={index} className={`text-center p-4 rounded-lg border ${
-                    index === 0 ? 'bg-green-50 border-green-200' :
-                    index === 1 ? 'bg-blue-50 border-blue-200' :
-                    index === 2 ? 'bg-purple-50 border-purple-200' :
-                    'bg-orange-50 border-orange-200'
-                  }`}>
-                    <div className={`text-sm mb-1 ${
-                      index === 0 ? 'text-green-600' :
-                      index === 1 ? 'text-blue-600' :
-                      index === 2 ? 'text-purple-600' :
-                      'text-orange-600'
-                    }`}>
-                      {milestone.label}
+                <Card className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    {formatCurrencyShort(primarySnapshot.averageAnnualCashFlow)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">年平均収支</div>
+                  {viewMode === 'comparison' && comparisonSnapshot && (
+                    <div className="text-xs mt-1">
+                      差分: {formatCurrencyShort(primarySnapshot.averageAnnualCashFlow - comparisonSnapshot.averageAnnualCashFlow)}
                     </div>
-                    <div className={`font-semibold ${
-                      index === 0 ? 'text-green-700' :
-                      index === 1 ? 'text-blue-700' :
-                      index === 2 ? 'text-purple-700' :
-                      'text-orange-700'
-                    }`}>
-                      {formatCurrency(milestone.value)}
+                  )}
+                </Card>
+
+                <Card className="p-4 text-center">
+                  <div className="text-2xl font-bold text-gray-600 mb-1">
+                    {primarySnapshot.yearsUntilNegative ? `${primarySnapshot.yearsUntilNegative}年` : '安全'}
+                  </div>
+                  <div className="text-sm text-muted-foreground">マイナス転落</div>
+                  {viewMode === 'comparison' && comparisonSnapshot && (
+                    <div className="text-xs mt-1">
+                      {comparisonSnapshot.yearsUntilNegative ? 
+                        `比較: ${comparisonSnapshot.yearsUntilNegative}年` : 
+                        '比較: 安全'
+                      }
+                    </div>
+                  )}
+                </Card>
+
+                <Card className="p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                    {filteredPrimaryData.length}年
+                  </div>
+                  <div className="text-sm text-muted-foreground">分析期間</div>
+                  <div className="text-xs mt-1 text-muted-foreground">
+                    {primarySnapshot.assumptions.planStartYear}年〜
+                    {primarySnapshot.assumptions.planStartYear + filteredPrimaryData.length - 1}年
+                  </div>
+                </Card>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 下段: D-Chart v2メイン分析 */}
+        <div className="p-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                {viewMode === 'single' ? '長期資産推移分析' : 'シナリオ比較分析'}
+              </CardTitle>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  {primarySnapshot && (
+                    <>
+                      期間: {primarySnapshot.assumptions.planStartYear}年〜
+                      {primarySnapshot.assumptions.planStartYear + filteredPrimaryData.length - 1}年
+                      （{filteredPrimaryData.length}年間）
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">実績反映</Badge>
+                  <Badge variant="outline">今日ライン</Badge>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {primarySnapshot ? (
+                <div className="space-y-4">
+                  {/* メインD-Chart v2 */}
+                  <DChartV2
+                    data={filteredPrimaryData}
+                    height={600}
+                    events={primarySnapshot.assumptions.events}
+                    showControls={true}
+                  />
+
+                  {/* 比較モード時の追加チャート */}
+                  {viewMode === 'comparison' && comparisonSnapshot && (
+                    <div className="mt-8">
+                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5" />
+                        比較シナリオ: {comparisonSnapshot.name}
+                      </h3>
+                      <DChartV2
+                        data={filteredComparisonData}
+                        height={400}
+                        events={comparisonSnapshot.assumptions.events}
+                        showControls={false}
+                      />
+                    </div>
+                  )}
+
+                  {/* 分析インサイト */}
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">分析インサイト</h4>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      {primarySnapshot.yearsUntilNegative ? (
+                        <p>⚠️ {primarySnapshot.yearsUntilNegative}年後に資産がマイナスに転落する可能性があります。</p>
+                      ) : (
+                        <p>✅ 計画期間中は資産が安定して増加しています。</p>
+                      )}
+                      
+                      {primarySnapshot.averageAnnualCashFlow > 0 ? (
+                        <p>📈 年平均 {formatCurrencyShort(primarySnapshot.averageAnnualCashFlow)} の黒字を維持しています。</p>
+                      ) : (
+                        <p>📉 年平均 {formatCurrencyShort(Math.abs(primarySnapshot.averageAnnualCashFlow))} の赤字が発生しています。</p>
+                      )}
+                      
+                      {viewMode === 'comparison' && comparisonSnapshot && (
+                        <p>🔄 比較シナリオとの最終資産差は {formatCurrencyShort(Math.abs(primarySnapshot.finalAssets - comparisonSnapshot.finalAssets))} です。</p>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </div>
+              ) : (
+                <div className="h-96 flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>データを読み込み中...</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

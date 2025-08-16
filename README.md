@@ -7,18 +7,20 @@ Monorepo for the Financial Planning Application.
 
 ## Frontend
 
-The frontend is a Vite-powered React SPA. Development requires **Node.js 20 or later**.
+The frontend is a Vite-powered React SPA. Development requires **Node.js ^20.19 or >=22.12**.
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
 This starts the app at [http://localhost:5173](http://localhost:5173).
 
-To create a production build:
+To create a production build and preview it:
 
 ```bash
-npm run build
+npm run build && npm run preview
 ```
+
+GoldenLayout state persists in `localStorage.fpapp_gl_v1`. Remove that key to reset the layout.
