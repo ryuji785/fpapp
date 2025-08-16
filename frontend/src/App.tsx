@@ -7,7 +7,7 @@ import { DataEntry } from './components/DataEntry';
 import { List } from './components/List';
 import { LifeEvents } from './components/LifeEvents';
 import { FamilyManagement } from './components/FamilyManagement';
-import { Settings } from './components/Settings';
+import Settings from './components/Settings';
 import { Toaster } from './components/ui/sonner';
 
 // 開発中のコンポーネント用プレースホルダー

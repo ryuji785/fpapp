@@ -1,26 +1,34 @@
-# FPApp
+# FPApp (React + TypeScript + Vite)
 
-Monorepo for the Financial Planning Application.
+## 必要環境
+- Node.js 20 以上（推奨: v20 LTS）
+- npm 10+
 
-- `backend/`: Spring Boot backend
-- `frontend/`: React single-page application
-
-## Frontend
-
-The frontend is a Vite-powered React SPA. Development requires **Node.js ^20.19 or >=22.12**.
-
+## セットアップ
 ```bash
-cd frontend
 npm ci
+
 npm run dev
+# http://localhost:5173
+
+npm run build
+npm run preview
 ```
 
-This starts the app at [http://localhost:5173](http://localhost:5173).
+## デプロイ (Vercel)
+本リポジトリを Vercel に接続
 
-To create a production build and preview it:
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Node バージョン: package.json の `"engines": { "node": ">=20" }` を利用
+- SPA ルーティング: `vercel.json` の rewrites を利用
 
-```bash
-npm run build && npm run preview
-```
+## 技術構成
+- React 18, TypeScript, Vite 6
+- MUI (UI), Chart.js (グラフ)
+- react-router-dom (SPA ルーティング)
 
-GoldenLayout state persists in `localStorage.fpapp_gl_v1`. Remove that key to reset the layout.
+## ローカライズ
+- 表示言語: 日本語
+- 通貨: 日本円 (¥) 3 桁区切り
+- 日付: YYYY/MM/DD

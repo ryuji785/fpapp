@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -160,13 +160,23 @@ const sampleAccounts: Account[] = [
   }
 ];
 
-export function Settings() {
+export default function Settings() {
   const [activeTab, setActiveTab] = useState('income');
   const [incomeProfiles, setIncomeProfiles] = useState<IncomeProfile[]>(sampleIncomeProfiles);
   const [assumptionSets, setAssumptionSets] = useState<AssumptionSet[]>(sampleAssumptionSets);
   const [accounts, setAccounts] = useState<Account[]>(sampleAccounts);
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    const stored = localStorage.getItem('fpapp_dark_mode');
+    const enabled = stored === 'true';
+    setIsDarkMode(enabled);
+    document.documentElement.classList.toggle('dark', enabled);
+  }, []);
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('fpapp_dark_mode', String(isDarkMode));
+  }, [isDarkMode]);
   const [userName, setUserName] = useState('田中 太郎');
   const [userEmail, setUserEmail] = useState('tanaka@example.com');
 
