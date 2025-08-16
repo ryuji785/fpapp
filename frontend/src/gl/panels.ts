@@ -3,7 +3,7 @@ import { DataEntry } from '../components/DataEntry';
 import { List } from '../components/List';
 import { FutureCF } from '../components/FutureCF';
 import { LifeEvents } from '../components/LifeEvents';
-import { Settings } from '../components/Settings';
+import Settings from '../components/Settings';
 
 export const PANELS = [
   { key: 'dashboard', title: 'ダッシュボード', component: Dashboard },

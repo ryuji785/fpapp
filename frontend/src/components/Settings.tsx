@@ -160,7 +160,7 @@ const sampleAccounts: Account[] = [
   }
 ];
 
-export function Settings() {
+export default function Settings() {
   const [activeTab, setActiveTab] = useState('income');
   const [incomeProfiles, setIncomeProfiles] = useState<IncomeProfile[]>(sampleIncomeProfiles);
   const [assumptionSets, setAssumptionSets] = useState<AssumptionSet[]>(sampleAssumptionSets);

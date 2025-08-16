@@ -54,14 +54,14 @@
     "recharts": "^2.15.2",
     "sonner": "^2.0.3",
     "tailwind-merge": "^2.3.0",
-    "vaul": "^1.1.2",
-    "vite": "^4.5.0"
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^6.0.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
@@ -69,6 +69,6 @@
     "typescript": "^5.4.2"
   },
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": ">=20"
   }
 }
