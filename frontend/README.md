@@ -4,7 +4,7 @@ React single-page application built with Vite.
 
 ## Development
 
-Requires **Node.js 20 or later**.
+Requires **Node.js ^20.19 or >=22.12**.
 
 ```bash
 npm install

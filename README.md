@@ -7,7 +7,7 @@ Monorepo for the Financial Planning Application.
 
 ## Frontend
 
-The frontend is a Vite-powered React SPA. Development requires **Node.js 20 or later**.
+The frontend is a Vite-powered React SPA. Development requires **Node.js ^20.19 or >=22.12**.
 
 ```bash
 cd frontend
