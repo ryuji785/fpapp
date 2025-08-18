@@ -1,54 +1,36 @@
--- schema extension for households and transactions
+-- accounts, cards, transactions and seed data
 
--- new enum for transaction types
-CREATE TYPE transaction_type AS ENUM ('INCOME', 'EXPENSE', 'SAVINGS');
-
--- extend category_type enum to support savings
-ALTER TYPE category_type ADD VALUE IF NOT EXISTS 'SAVINGS';
-
--- households table
-CREATE TABLE households (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    notes TEXT
-);
-
--- family members table
-CREATE TABLE family_members (
-    id BIGSERIAL PRIMARY KEY,
-    household_id BIGINT REFERENCES households(id),
-    name VARCHAR(100) NOT NULL,
-    relationship VARCHAR(20),
-    birth_date DATE,
-    gender VARCHAR(10),
-    employment_status VARCHAR(30),
-    school_start_age INT,
-    retirement_age INT,
-    memo TEXT
-);
-
--- accounts table
 CREATE TABLE accounts (
     id BIGSERIAL PRIMARY KEY,
     household_id BIGINT REFERENCES households(id),
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100),
+    version BIGINT NOT NULL DEFAULT 0
 );
 
--- cards table
 CREATE TABLE cards (
     id BIGSERIAL PRIMARY KEY,
     household_id BIGINT REFERENCES households(id),
     name VARCHAR(100) NOT NULL,
     limit_amount NUMERIC(10,2),
     closing_day INT,
-    payment_due_day INT
+    payment_due_day INT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100),
+    version BIGINT NOT NULL DEFAULT 0
 );
 
--- add parent_type column to categories
+CREATE TYPE transaction_type AS ENUM ('INCOME', 'EXPENSE', 'SAVINGS');
+ALTER TYPE category_type ADD VALUE IF NOT EXISTS 'SAVINGS';
+
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_type category_type;
 UPDATE categories SET parent_type = type WHERE parent_type IS NULL;
 
--- transactions table
 CREATE TABLE transactions (
     id BIGSERIAL PRIMARY KEY,
     household_id BIGINT REFERENCES households(id),
@@ -65,13 +47,13 @@ CREATE TABLE transactions (
     to_account_id BIGINT REFERENCES accounts(id),
     memo TEXT,
     receipt_path VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(100),
+    updated_by VARCHAR(100),
+    version BIGINT NOT NULL DEFAULT 0
 );
 
--- seed demo household
-INSERT INTO households (id, name, notes) VALUES (1, 'Demo Household', NULL);
-
--- extend payment methods
 INSERT INTO payment_methods (name) VALUES
   ('cash'),
   ('bank transfer'),
@@ -80,6 +62,5 @@ INSERT INTO payment_methods (name) VALUES
   ('e-money'),
   ('direct debit');
 
--- seed savings category
 INSERT INTO categories (type, name, parent_type) VALUES
   ('SAVINGS', '貯蓄', 'SAVINGS');
