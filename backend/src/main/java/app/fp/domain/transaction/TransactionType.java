@@ -1,4 +1,4 @@
-package app.fp.transaction;
+package app.fp.domain.transaction;
 
 public enum TransactionType {
     INCOME,

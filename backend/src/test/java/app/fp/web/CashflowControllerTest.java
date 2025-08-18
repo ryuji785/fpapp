@@ -1,4 +1,4 @@
-package app.fp.transaction;
+package app.fp.web;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,7 +14,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import app.fp.application.cashflow.CashflowService;
+import app.fp.domain.transaction.CashflowSummary;
 import app.fp.dto.CashflowSummaryDto;
+import app.fp.web.mapper.CashflowMapper;
 
 @WebMvcTest(CashflowController.class)
 class CashflowControllerTest {

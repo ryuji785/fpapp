@@ -1,4 +1,4 @@
-package app.fp.payment;
+package app.fp.domain.payment;
 
 import java.math.BigDecimal;
 

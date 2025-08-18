@@ -1,4 +1,4 @@
-package app.fp.transaction;
+package app.fp.application.cashflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -12,15 +12,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import app.fp.domain.repository.TransactionRepository;
+import app.fp.domain.transaction.CashflowSummary;
+
 @ExtendWith(MockitoExtension.class)
 class CashflowServiceTest {
 
     @Mock
-    TransactionMapper transactionMapper;
+    TransactionRepository transactionRepository;
 
     @Test
     void calculatesMonthlySummary() {
-        CashflowService service = new CashflowService(transactionMapper);
+        CashflowService service = new CashflowService(transactionRepository);
         CashflowSummary summary = new CashflowSummary();
         summary.setIncome(new BigDecimal("1000"));
         summary.setExpense(new BigDecimal("500"));
@@ -28,7 +31,7 @@ class CashflowServiceTest {
         YearMonth ym = YearMonth.of(2024, 1);
         LocalDate start = ym.atDay(1);
         LocalDate end = ym.atEndOfMonth();
-        when(transactionMapper.sumByType(1L, start, end)).thenReturn(summary);
+        when(transactionRepository.sumByType(1L, start, end)).thenReturn(summary);
 
         CashflowSummary result = service.getMonthlySummary(1L, ym);
 

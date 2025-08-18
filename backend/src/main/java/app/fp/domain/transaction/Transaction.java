@@ -1,4 +1,4 @@
-package app.fp.transaction;
+package app.fp.domain.transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

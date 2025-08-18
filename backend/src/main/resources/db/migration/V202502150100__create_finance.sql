@@ -15,7 +15,7 @@ CREATE TABLE cards (
     id BIGSERIAL PRIMARY KEY,
     household_id BIGINT REFERENCES households(id),
     name VARCHAR(100) NOT NULL,
-    limit_amount NUMERIC(10,2),
+    limit_amount NUMERIC(19,4),
     closing_day INT,
     payment_due_day INT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -37,7 +37,7 @@ CREATE TABLE transactions (
     user_id BIGINT REFERENCES users(id),
     type transaction_type NOT NULL,
     category_id BIGINT REFERENCES categories(id),
-    amount NUMERIC(10,2) NOT NULL,
+    amount NUMERIC(19,4) NOT NULL,
     occurred_date DATE NOT NULL,
     payment_method_id BIGINT REFERENCES payment_methods(id),
     card_id BIGINT REFERENCES cards(id),
@@ -60,7 +60,20 @@ INSERT INTO payment_methods (name) VALUES
   ('credit card'),
   ('debit card'),
   ('e-money'),
-  ('direct debit');
+  ('direct debit'),
+  ('Rakuten'),
+  ('Aeon'),
+  ('Amazon Mastercard'),
+  ('JCB'),
+  ('Mitsui Sumitomo'),
+  ('other card'),
+  ('Suica'),
+  ('PASMO'),
+  ('nanaco'),
+  ('WAON'),
+  ('PayPay'),
+  ('LINE Pay'),
+  ('other e-money');
 
 INSERT INTO categories (type, name, parent_type) VALUES
   ('SAVINGS', '貯蓄', 'SAVINGS');

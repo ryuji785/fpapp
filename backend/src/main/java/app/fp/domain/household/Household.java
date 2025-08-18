@@ -1,4 +1,4 @@
-package app.fp.household;
+package app.fp.domain.household;
 
 import lombok.Data;
 

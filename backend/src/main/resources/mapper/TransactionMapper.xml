@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="app.fp.transaction.TransactionMapper">
-  <resultMap id="TransactionResult" type="app.fp.transaction.Transaction">
+<mapper namespace="app.fp.infrastructure.mapper.TransactionMapper">
+  <resultMap id="TransactionResult" type="app.fp.domain.transaction.Transaction">
     <id column="id" property="id"/>
     <result column="household_id" property="householdId"/>
     <result column="user_id" property="userId"/>
@@ -27,7 +27,7 @@
     ORDER BY occurred_date
   </select>
 
-  <select id="sumByType" resultType="app.fp.transaction.CashflowSummary">
+  <select id="sumByType" resultType="app.fp.domain.transaction.CashflowSummary">
     SELECT
       COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount END),0) AS income,
       COALESCE(SUM(CASE WHEN type = 'EXPENSE' THEN amount END),0) AS expense,

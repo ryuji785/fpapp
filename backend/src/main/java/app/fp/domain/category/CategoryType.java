@@ -1,4 +1,4 @@
-package app.fp.category;
+package app.fp.domain.category;
 
 public enum CategoryType {
     EXPENSE,
