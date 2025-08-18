@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.fp.transaction.TransactionMapper">
+  <resultMap id="TransactionResult" type="app.fp.transaction.Transaction">
+    <id column="id" property="id"/>
+    <result column="household_id" property="householdId"/>
+    <result column="user_id" property="userId"/>
+    <result column="type" property="type" jdbcType="VARCHAR"/>
+    <result column="category_id" property="categoryId"/>
+    <result column="amount" property="amount"/>
+    <result column="occurred_date" property="occurredDate"/>
+    <result column="payment_method_id" property="paymentMethodId"/>
+    <result column="card_id" property="cardId"/>
+    <result column="emoney_type" property="emoneyType"/>
+    <result column="account_id" property="accountId"/>
+    <result column="from_account_id" property="fromAccountId"/>
+    <result column="to_account_id" property="toAccountId"/>
+    <result column="memo" property="memo"/>
+    <result column="receipt_path" property="receiptPath"/>
+    <result column="created_at" property="createdAt"/>
+  </resultMap>
+
+  <select id="findByHouseholdAndPeriod" resultMap="TransactionResult">
+    SELECT * FROM transactions
+    WHERE household_id = #{householdId}
+      AND occurred_date BETWEEN #{startDate} AND #{endDate}
+    ORDER BY occurred_date
+  </select>
+
+  <select id="sumByType" resultType="app.fp.transaction.CashflowSummary">
+    SELECT
+      COALESCE(SUM(CASE WHEN type = 'INCOME' THEN amount END),0) AS income,
+      COALESCE(SUM(CASE WHEN type = 'EXPENSE' THEN amount END),0) AS expense,
+      COALESCE(SUM(CASE WHEN type = 'SAVINGS' THEN amount END),0) AS savings
+    FROM transactions
+    WHERE household_id = #{householdId}
+      AND occurred_date BETWEEN #{startDate} AND #{endDate}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO transactions (
+      household_id, user_id, type, category_id, amount, occurred_date,
+      payment_method_id, card_id, emoney_type, account_id, from_account_id,
+      to_account_id, memo, receipt_path, created_at)
+    VALUES (
+      #{householdId}, #{userId}, #{type}, #{categoryId}, #{amount}, #{occurredDate},
+      #{paymentMethodId}, #{cardId}, #{emoneyType}, #{accountId}, #{fromAccountId},
+      #{toAccountId}, #{memo}, #{receiptPath}, #{createdAt})
+  </insert>
+</mapper>
