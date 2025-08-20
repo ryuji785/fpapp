@@ -3,9 +3,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'io.github.cdimascio:dotenv-java:2.3.2'
+        classpath 'io.github.cdimascio:dotenv-java:3.0.0'
     }
 }
+
+import io.github.cdimascio.dotenv.Dotenv
 
 plugins {
     id 'org.springframework.boot' version '3.2.4'
@@ -39,6 +41,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
     implementation 'org.flywaydb:flyway-core:10.17.2'
     implementation 'org.flywaydb:flyway-database-postgresql:10.17.2'
     implementation 'org.postgresql:postgresql:42.7.3'
@@ -47,15 +50,18 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-def dotenv = io.github.cdimascio.dotenv.Dotenv.configure()
-        .directory(rootProject.rootDir.absolutePath)
+def dotenv = Dotenv.configure()
+        .directory(rootProject.rootDir.toString())
         .ignoreIfMissing()
         .load()
 
+println "DB_USER from dotenv: ${dotenv.get('DB_USER')}"
+println "DB_PASS_WORD from dotenv: ${dotenv.get('DB_PASS_WORD')}"
+
 flyway {
     url = 'jdbc:postgresql://localhost:5432/fpapp'
-    user = dotenv['DB_USER']
-    password = dotenv['DB_PASS_WORD']
+    user = dotenv.get('DB_USER')
+    password = dotenv.get('DB_PASS_WORD')
 }
 
 tasks.withType(JavaCompile).configureEach {
