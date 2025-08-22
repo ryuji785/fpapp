@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'io.github.cdimascio:dotenv-java:3.0.0'
+    }
+}
+
+import io.github.cdimascio.dotenv.Dotenv
 
 plugins {
     id 'org.springframework.boot' version '3.2.4'
@@ -5,6 +15,11 @@ plugins {
     id 'java'
     id 'org.flywaydb.flyway' version '9.22.3'
 }
+
+def dotenv = Dotenv.configure()
+        .directory(rootProject.rootDir.toString())
+        .ignoreIfMissing()
+        .load()
 
 group = 'app.fp'
 version = '0.0.1-SNAPSHOT'
@@ -40,8 +55,8 @@ dependencies {
 
 flyway {
     url = 'jdbc:postgresql://localhost:5432/fpapp'
-    user = System.getenv('DB_USER')
-    password = System.getenv('DB_PASS_WORD')
+    user = dotenv.get("DB_USER")
+    password = dotenv.get("DB_PASS_WORD")
 }
 
 tasks.withType(JavaCompile).configureEach {
