@@ -37,10 +37,34 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+// Load .env manually
+def loadEnv() {
+    def env = [:]
+    def envFile = file("${rootProject.rootDir}/../.env")
+    if (envFile.exists()) {
+        envFile.eachLine { line ->
+            if (!line.trim().isEmpty() && !line.trim().startsWith("#")) {
+                def parts = line.split('=')
+                if (parts.length == 2) {
+                    def key = parts[0].trim()
+                    def value = parts[1].trim()
+                    env[key] = value
+                    System.setProperty(key, value)
+                }
+            }
+        }
+    }
+    return env
+}
+
+def env = loadEnv()
+
 flyway {
     url = 'jdbc:postgresql://localhost:5432/fpapp'
-    user = System.getenv('DB_USER')
-    password = System.getenv('DB_PASS_WORD')
+    user = System.getProperty("DB_USER")
+    password = System.getProperty("DB_PASS_WORD")
+    locations = ['filesystem:src/main/resources/db/migration']
+    cleanDisabled = false
 }
 
 tasks.withType(JavaCompile).configureEach {
