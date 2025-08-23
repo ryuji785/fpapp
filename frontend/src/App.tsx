@@ -8,6 +8,7 @@ import { List } from './components/List';
 import { LifeEvents } from './components/LifeEvents';
 import { FamilyManagement } from './components/FamilyManagement';
 import Settings from './components/Settings';
+import BudgetList from './components/BudgetList';
 import { Toaster } from './components/ui/sonner';
 
 // 開発中のコンポーネント用プレースホルダー
@@ -123,7 +124,7 @@ export default function App() {
       case 'household-book':
         return <HouseholdBook />;
       case 'budget-monthly':
-        return <UnderDevelopment title="予算管理" />;
+        return <BudgetList />;
       case 'variance-center':
         return <UnderDevelopment title="予算の見直し" />;
       case 'monthly-close':
