@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '9.22.3'
+    id 'org.flywaydb.flyway' version '10.10.0'
 }
 
 group = 'app.fp'
@@ -26,21 +26,41 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     implementation 'org.flywaydb:flyway-core:10.17.2'
     implementation 'org.flywaydb:flyway-database-postgresql:10.17.2'
     implementation 'org.postgresql:postgresql:42.7.3'
+    // .env を Spring Environment に取り込む
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+// ===== .env ローダ（Gradle 用 / Flyway タスクで利用） =====
+def loadDotenvFromRoot() {
+    def env = [:]
+    def envFile = file("${rootProject.rootDir}/.env")
+    if (!envFile.exists()) return env
+    envFile.eachLine { line ->
+        def t = line.trim()
+        if (!t || t.startsWith('#') || !t.contains('=')) return
+        def (k, v) = t.split('=', 2)
+        env[k.trim()] = v.trim()
+    }
+    return env
+}
+def dotenv = loadDotenvFromRoot()
+
+// ===== Flyway 設定（Gradle タスク用） =====
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/fpapp'
-    user = System.getenv('DB_USER')
-    password = System.getenv('DB_PASS_WORD')
+    url = (System.getenv('DB_URL') ?: dotenv['DB_URL'] ?: 'jdbc:postgresql://localhost:5432/fpapp')
+    user = (System.getenv('DB_USER') ?: dotenv['DB_USER'])
+    password = (System.getenv('DB_PASS_WORD') ?: dotenv['DB_PASS_WORD'])
     locations = ['filesystem:src/main/resources/db/migration']
     cleanDisabled = false
 }
@@ -51,4 +71,9 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// ===== bootRun / test に .env の場所を渡す =====
+tasks.withType(JavaExec).configureEach {
+    systemProperty "dotenv.path", rootProject.rootDir.absolutePath
 }
