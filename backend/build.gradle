@@ -1,8 +1,16 @@
+buildscript {
+    repositories { mavenCentral() }
+    dependencies {
+        classpath 'org.flywaydb:flyway-database-postgresql:10.17.2'
+        classpath 'org.postgresql:postgresql:42.7.3'
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '10.10.0'
+    id 'org.flywaydb.flyway' version '10.17.2'
 }
 
 group = 'app.fp'
@@ -39,6 +47,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Flyway タスク用のクラスパスは buildscript で設定
 }
 
 // ===== .env ローダ（Gradle 用 / Flyway タスクで利用） =====
