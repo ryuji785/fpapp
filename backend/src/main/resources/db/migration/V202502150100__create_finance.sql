@@ -26,7 +26,6 @@ CREATE TABLE cards (
 );
 
 CREATE TYPE transaction_type AS ENUM ('INCOME', 'EXPENSE', 'SAVINGS');
-ALTER TYPE category_type ADD VALUE IF NOT EXISTS 'SAVINGS';
 
 ALTER TABLE categories ADD COLUMN IF NOT EXISTS parent_type category_type;
 UPDATE categories SET parent_type = type WHERE parent_type IS NULL;
