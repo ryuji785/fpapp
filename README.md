@@ -39,8 +39,8 @@ npm run preview
 
 **Environment variables**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
-- `DB_USERNAME=fpapp`
-- `DB_PASSWORD=fpapp_dev`
+- `DB_USER=fpapp`
+- `DB_PASS_WORD=fpapp_dev`
 
 **Start**
 ```bash
@@ -57,8 +57,8 @@ If DB is empty, Flyway will apply migrations automatically on startup. Verify he
 
 **Env (examples)**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
-- `DB_USERNAME=fpapp`
-- `DB_PASSWORD=fpapp_dev`
+- `DB_USER=fpapp`
+- `DB_PASS_WORD=fpapp_dev`
 
 **Commands**
 ```bash
