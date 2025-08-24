@@ -7,6 +7,8 @@
 ## セットアップ
 ```bash
 npm ci
+# 型定義が必要な場合
+npm install --save-dev @types/react @types/react-dom
 
 npm run dev
 # http://localhost:5173
@@ -27,6 +29,7 @@ npm run preview
 - React 18, TypeScript, Vite 6
 - MUI (UI), Chart.js (グラフ)
 - react-router-dom (SPA ルーティング)
+- Backend: Spring Boot (MyBatis, Flyway)
 
 ## ローカライズ
 - 表示言語: 日本語
@@ -40,7 +43,7 @@ npm run preview
 **Environment variables**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
 - `DB_USER=fpapp`
-- `DB_PASSWORD=fpapp_dev`
+- `DB_PASS_WORD=fpapp_dev`
 
 **Start**
 ```bash
@@ -58,7 +61,7 @@ If DB is empty, Flyway will apply migrations automatically on startup. Verify he
 **Env (examples)**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
 - `DB_USER=fpapp`
-- `DB_PASSWORD=fpapp_dev`
+- `DB_PASS_WORD=fpapp_dev`
 
 **Commands**
 ```bash
@@ -85,7 +88,7 @@ For convenience, you can load `.env` before running Gradle tasks:
 ./env.ps1; ./gradlew :backend:flywayMigrate
 ```
 
-Both scripts export variables from `.env` so Flyway and Spring Boot can read `DB_URL`, `DB_USER`, and `DB_PASSWORD` without exposing credentials in the build.
+Both scripts export variables from `.env` so Flyway and Spring Boot can read `DB_URL`, `DB_USER`, and `DB_PASS_WORD` without exposing credentials in the build.
 
 ---
 
