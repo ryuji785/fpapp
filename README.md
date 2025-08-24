@@ -32,3 +32,23 @@ npm run preview
 - 表示言語: 日本語
 - 通貨: 日本円 (¥) 3 桁区切り
 - 日付: YYYY/MM/DD
+
+## Backend: run locally (PostgreSQL + Flyway)
+
+**Prereqs:** JDK 21, PostgreSQL running at `localhost:5432`.
+
+**Environment variables**
+- `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
+- `DB_USERNAME=fpapp`
+- `DB_PASSWORD=fpapp_dev`
+
+**Start**
+```bash
+# Gradle
+./gradlew bootRun
+# or Maven
+./mvnw spring-boot:run
+```
+
+If DB is empty, Flyway will apply migrations automatically on startup. Verify health:
+`GET http://localhost:8080/actuator/health → {"status":"UP"}`

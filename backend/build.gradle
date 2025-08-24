@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '10.10.0'
+    id 'org.flywaydb.flyway' version '10.16.0'
 }
 
 group = 'app.fp'
@@ -18,7 +18,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    create('flyway')
 }
 
 repositories {
@@ -31,50 +30,23 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.flywaydb:flyway-core:10.10.0'
-    implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.flywaydb:flyway-core:10.16.0'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.16.0'
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
     // .env を Spring Environment に取り込む
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-
-    // Flyway タスク用の依存
-    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.10.0')
-    add('flyway', 'org.postgresql:postgresql:42.7.3')
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-// --- .env ロード ---
-def loadEnv() {
-    def env = [:]
-    def envFile = file("${rootProject.rootDir}/../.env")
-    if (!envFile.exists()) {
-        println ".env file not found at ${envFile.absolutePath}"
-        return env
-    }
-    envFile.eachLine { line ->
-        def t = line.trim()
-        if (!t || t.startsWith('#') || !t.contains('=')) return
-        def (k, v) = t.split('=', 2)
-        env[k.trim()] = v.trim()
-        System.setProperty(k.trim(), v.trim())
-    }
-    return env
-}
-def env = loadEnv()
-
 flyway {
-    url = System.getProperty("DB_URL") ?: env["DB_URL"]
-    user = System.getProperty("DB_USER") ?: env["DB_USER"]
-    password = System.getProperty("DB_PASS_WORD") ?: env["DB_PASS_WORD"]
-
-    if (!url || !user || !password) {
-        throw new GradleException("Flyway DB connection properties are missing! Check .env (DB_URL, DB_USER, DB_PASS_WORD)")
-    }
-
-    cleanDisabled = false
+    url = 'jdbc:postgresql://localhost:5432/fpapp'
+    user = System.getenv('DB_USERNAME')
+    password = System.getenv('DB_PASSWORD')
     locations = ['filesystem:src/main/resources/db/migration']
+    cleanDisabled = false
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -85,7 +57,3 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// ===== bootRun / test に .env の場所を渡す =====
-tasks.withType(JavaExec).configureEach {
-    systemProperty "dotenv.path", rootProject.rootDir.absolutePath
-}
