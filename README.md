@@ -45,10 +45,14 @@ npm run preview
 - `DB_USER=fpapp`
 - `DB_PASS_WORD=fpapp_dev`
 
+Use `env.sh` (Linux/macOS) or `env.ps1` (Windows) to export these values from `.env` before running backend commands.
+
 **Start**
 ```bash
-# Gradle
-./gradlew bootRun
+# Gradle (load .env first)
+./env.sh ./gradlew bootRun
+# Windows PowerShell
+./env.ps1; ./gradlew bootRun
 # or Maven
 ./mvnw spring-boot:run
 ```
