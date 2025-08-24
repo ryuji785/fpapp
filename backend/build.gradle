@@ -47,7 +47,7 @@ dependencies {
 flyway {
     url = System.getenv("DB_URL")
     user = System.getenv("DB_USER")
-    password = System.getenv("DB_PASS_WORD")
+    password = System.getenv("DB_PASSWORD")
     schemas = ["public"]
     locations = ["classpath:db/migration"]
     cleanDisabled = false
@@ -64,6 +64,6 @@ tasks.named('test') {
 tasks.named('bootRun') {
     systemProperty "spring.datasource.url", System.getenv("DB_URL")
     systemProperty "spring.datasource.username", System.getenv("DB_USER")
-    systemProperty "spring.datasource.password", System.getenv("DB_PASS_WORD")
+    systemProperty "spring.datasource.password", System.getenv("DB_PASSWORD")
 }
 

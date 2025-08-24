@@ -43,7 +43,7 @@ npm run preview
 **Environment variables**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
 - `DB_USER=fpapp`
-- `DB_PASS_WORD=fpapp_dev`
+- `DB_PASSWORD=fpapp_dev`
 
 Use `env.sh` (Linux/macOS) or `env.ps1` (Windows) to export these values from `.env` before running backend commands.
 
@@ -60,12 +60,19 @@ Use `env.sh` (Linux/macOS) or `env.ps1` (Windows) to export these values from `.
 If DB is empty, Flyway will apply migrations automatically on startup. Verify health:
 `GET http://localhost:8080/actuator/health → {"status":"UP"}`
 
+Once the backend is running, install dependencies and start the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ### Database migrations (Flyway via Gradle)
 
 **Env (examples)**
 - `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
 - `DB_USER=fpapp`
-- `DB_PASS_WORD=fpapp_dev`
+- `DB_PASSWORD=fpapp_dev`
 
 **Commands**
 ```bash
@@ -92,7 +99,7 @@ For convenience, you can load `.env` before running Gradle tasks:
 ./env.ps1; ./gradlew :backend:flywayMigrate
 ```
 
-Both scripts export variables from `.env` so Flyway and Spring Boot can read `DB_URL`, `DB_USER`, and `DB_PASS_WORD` without exposing credentials in the build.
+Both scripts export variables from `.env` so Flyway and Spring Boot can read `DB_URL`, `DB_USER`, and `DB_PASSWORD` without exposing credentials in the build.
 
 ---
 
