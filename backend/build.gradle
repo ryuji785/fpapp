@@ -1,7 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.flywaydb.flyway' version '10.16.0'
+    id 'org.flywaydb.flyway' version '10.17.2'
     id 'java'
 }
 
@@ -31,15 +31,15 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.flywaydb:flyway-core:10.16.0'
-    implementation 'org.flywaydb:flyway-database-postgresql:10.16.0'
-    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.flywaydb:flyway-core:10.17.2'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.17.2'
+    runtimeOnly 'org.postgresql:postgresql:42.7.2'
     // .env を Spring Environment に取り込む
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // Flyway Gradle tasks need explicit DB plugin and driver
-    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.16.0')
-    add('flyway', 'org.postgresql:postgresql:42.7.3')
+    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.17.2')
+    add('flyway', 'org.postgresql:postgresql:42.7.2')
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -49,7 +49,7 @@ dependencies {
 flyway {
     url = System.getenv("DB_URL")
     user = System.getenv("DB_USER")
-    password = System.getenv("DB_PASS_WORD")
+    password = System.getenv("DB_PASSWORD")
     schemas = ["public"]
     locations = ["classpath:db/migration"]
     cleanDisabled = false
