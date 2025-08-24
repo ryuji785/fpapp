@@ -48,8 +48,11 @@ dependencies {
 // --- .env ロード ---
 def loadEnv() {
     def env = [:]
-    def envFile = file("${rootProject.rootDir}/.env")
-    if (!envFile.exists()) return env
+    def envFile = file("${rootProject.rootDir}/../.env")
+    if (!envFile.exists()) {
+        println ".env file not found at ${envFile.absolutePath}"
+        return env
+    }
     envFile.eachLine { line ->
         def t = line.trim()
         if (!t || t.startsWith('#') || !t.contains('=')) return
@@ -62,9 +65,14 @@ def loadEnv() {
 def env = loadEnv()
 
 flyway {
-    url = System.getProperty("DB_URL")
-    user = System.getProperty("DB_USER")
-    password = System.getProperty("DB_PASS_WORD")
+    url = System.getProperty("DB_URL") ?: env["DB_URL"]
+    user = System.getProperty("DB_USER") ?: env["DB_USER"]
+    password = System.getProperty("DB_PASS_WORD") ?: env["DB_PASS_WORD"]
+
+    if (!url || !user || !password) {
+        throw new GradleException("Flyway DB connection properties are missing! Check .env (DB_URL, DB_USER, DB_PASS_WORD)")
+    }
+
     cleanDisabled = false
     locations = ['filesystem:src/main/resources/db/migration']
 }
