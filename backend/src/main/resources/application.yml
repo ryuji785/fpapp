@@ -1,8 +1,19 @@
 spring:
+  config:
+    import: optional:file:../.env[.properties]
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/${POSTGRES_DB:fpapp_db}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:password}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fpapp}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fpapp}
+    user: ${DB_USER}
+    password: ${DB_PASSWORD}
+    clean-disabled: false
+    locations: classpath:db/migration
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
@@ -12,10 +23,11 @@ spring:
   web:
     cors:
       allowed-origins: http://localhost:5173
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-  mapper-locations: classpath*:mapper/*.xml
+  mybatis:
+    configuration:
+      map-underscore-to-camel-case: true
+    mapper-locations: classpath:mapper/*.xml
+    type-aliases-package: app.fp.domain
 server:
   servlet:
     context-path: ""
