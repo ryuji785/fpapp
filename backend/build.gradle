@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
-    id 'org.flywaydb.flyway' version '10.17.2'
+    id 'org.flywaydb.flyway' version '10.10.0'
 }
 
 group = 'app.fp'
@@ -31,13 +31,13 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.flywaydb:flyway-core:10.17.2'
+    implementation 'org.flywaydb:flyway-core:10.10.0'
     implementation 'org.postgresql:postgresql:42.7.3'
     // .env を Spring Environment に取り込む
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // Flyway タスク用の依存
-    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.17.2')
+    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.10.0')
     add('flyway', 'org.postgresql:postgresql:42.7.3')
 
     compileOnly 'org.projectlombok:lombok'
@@ -45,8 +45,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-// ===== .env ローダ（Gradle 用 / Flyway タスクで利用） =====
-def loadDotenvFromRoot() {
+// --- .env ロード ---
+def loadEnv() {
     def env = [:]
     def envFile = file("${rootProject.rootDir}/.env")
     if (!envFile.exists()) return env
@@ -55,18 +55,18 @@ def loadDotenvFromRoot() {
         if (!t || t.startsWith('#') || !t.contains('=')) return
         def (k, v) = t.split('=', 2)
         env[k.trim()] = v.trim()
+        System.setProperty(k.trim(), v.trim())
     }
     return env
 }
-def dotenv = loadDotenvFromRoot()
+def env = loadEnv()
 
-// ===== Flyway 設定（Gradle タスク用） =====
 flyway {
-    url = (System.getenv('DB_URL') ?: dotenv['DB_URL'] ?: 'jdbc:postgresql://localhost:5432/fpapp')
-    user = (System.getenv('DB_USER') ?: dotenv['DB_USER'])
-    password = (System.getenv('DB_PASS_WORD') ?: dotenv['DB_PASS_WORD'])
-    locations = ['filesystem:src/main/resources/db/migration']
+    url = System.getProperty("DB_URL")
+    user = System.getProperty("DB_USER")
+    password = System.getProperty("DB_PASS_WORD")
     cleanDisabled = false
+    locations = ['filesystem:src/main/resources/db/migration']
 }
 
 tasks.withType(JavaCompile).configureEach {
