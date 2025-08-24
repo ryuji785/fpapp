@@ -52,3 +52,43 @@ npm run preview
 
 If DB is empty, Flyway will apply migrations automatically on startup. Verify health:
 `GET http://localhost:8080/actuator/health → {"status":"UP"}`
+
+### Database migrations (Flyway via Gradle)
+
+**Env (examples)**
+- `DB_URL=jdbc:postgresql://localhost:5432/fpapp`
+- `DB_USERNAME=fpapp`
+- `DB_PASSWORD=fpapp_dev`
+
+**Commands**
+```bash
+# Check connection & migrations visible to the Gradle plugin
+./gradlew :backend:flywayInfo
+
+# Apply migrations
+./gradlew :backend:flywayMigrate
+
+# Reset DB (dangerous)
+./gradlew :backend:flywayClean
+```
+
+Flyway DB plugin and JDBC driver are wired to the Gradle tasks via the flyway configuration.
+Spring Boot runtime will also auto-migrate on startup.
+
+---
+
+### 7) Verification checklist
+
+- `./gradlew :backend:flywayInfo` connects and lists migrations without `No database found to handle jdbc:postgresql…`.
+- `./gradlew :backend:flywayMigrate` succeeds.
+- App starts, Flyway logs show `Successfully applied … migrations`.
+- Deprecation warnings no longer flood the console (may still appear in summary).
+
+---
+
+### Why this fixes it
+
+Flyway 10 splits database support from core. The **Gradle plugin** runs on the build classpath and **needs its own dependencies**:
+`flyway-database-postgresql` **and** `org.postgresql:postgresql`.
+Without them, the plugin cannot handle `jdbc:postgresql://…` and throws exactly the error you saw.
+We also bound the plugin to the same DB URL as Spring to avoid environment drift.

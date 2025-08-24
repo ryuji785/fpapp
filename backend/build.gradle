@@ -1,8 +1,8 @@
 plugins {
-    id 'org.springframework.boot' version '3.2.4'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'java'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.5'
     id 'org.flywaydb.flyway' version '10.16.0'
+    id 'java'
 }
 
 group = 'app.fp'
@@ -18,6 +18,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    create("flyway")
 }
 
 repositories {
@@ -36,16 +37,21 @@ dependencies {
     // .env を Spring Environment に取り込む
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
+    // Flyway Gradle tasks need explicit DB plugin and driver
+    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.16.0')
+    add('flyway', 'org.postgresql:postgresql:42.7.3')
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/fpapp'
-    user = System.getenv('DB_USERNAME')
-    password = System.getenv('DB_PASSWORD')
-    locations = ['filesystem:src/main/resources/db/migration']
+    url = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/fpapp"
+    user = System.getenv("DB_USERNAME") ?: "fpapp"
+    password = System.getenv("DB_PASSWORD") ?: "fpapp_dev"
+    schemas = ["public"]
+    locations = ["classpath:db/migration"]
     cleanDisabled = false
 }
 
