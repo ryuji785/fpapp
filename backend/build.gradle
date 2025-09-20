@@ -1,7 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.flywaydb.flyway' version '10.14.0'
     id 'java'
 }
 
@@ -18,7 +17,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    create("flyway")
 }
 
 repositories {
@@ -32,25 +30,13 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-    implementation 'org.flywaydb:flyway-core:10.14.0'
-    implementation 'org.flywaydb:flyway-database-postgresql:10.14.0'
-    runtimeOnly 'org.postgresql:postgresql:42.7.2'
-
-    add('flyway', 'org.flywaydb:flyway-database-postgresql:10.14.0')
-    add('flyway', 'org.postgresql:postgresql:42.7.2')
+    implementation 'org.flywaydb:flyway-core:10.17.2'
+    implementation 'org.flywaydb:flyway-database-postgresql:10.17.2'
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-flyway {
-    url = System.getenv("DB_URL")
-    user = System.getenv("DB_USER")
-    password = System.getenv("DB_PASSWORD")
-    schemas = ["public"]
-    locations = ["classpath:db/migration"]
-    cleanDisabled = false
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -61,9 +47,4 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.named('bootRun') {
-    systemProperty "spring.datasource.url", System.getenv("DB_URL")
-    systemProperty "spring.datasource.username", System.getenv("DB_USER")
-    systemProperty "spring.datasource.password", System.getenv("DB_PASSWORD")
-}
 
