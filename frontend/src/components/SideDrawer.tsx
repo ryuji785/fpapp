@@ -27,7 +27,7 @@ const menuSections = [
     title: '家計管理',
     items: [
       { id: 'household-book', label: '家計簿', icon: BookOpen },
-      { id: 'budget-monthly', label: '予算管理', icon: Wallet, disabled: true },
+      { id: 'budget-monthly', label: '予算管理', icon: Wallet },
       { id: 'variance-center', label: '予算の見直し', icon: AlertTriangle, disabled: true },
       { id: 'monthly-close', label: '月締め', icon: Lock, disabled: true }
     ]

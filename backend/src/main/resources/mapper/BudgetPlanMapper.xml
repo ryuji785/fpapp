@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="app.fp.infrastructure.mapper.BudgetPlanMapper">
+
+  <resultMap id="BudgetPlanResultMap" type="app.fp.domain.plan.BudgetPlan">
+    <id property="id" column="id" />
+    <result property="title" column="title" />
+    <result property="totalAmount" column="total_amount" />
+  </resultMap>
+
+  <select id="findAll" resultMap="BudgetPlanResultMap">
+    SELECT id, title, total_amount FROM budget_plans
+  </select>
+
+  <select id="findById" resultMap="BudgetPlanResultMap">
+    SELECT id, title, total_amount FROM budget_plans WHERE id = #{id}
+  </select>
+
+  <insert id="insert">
+    INSERT INTO budget_plans (id, title, total_amount)
+    VALUES (#{id}, #{title}, #{totalAmount})
+  </insert>
+
+  <delete id="delete">
+    DELETE FROM budget_plans WHERE id = #{id}
+  </delete>
+
+</mapper>
